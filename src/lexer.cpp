@@ -1,17 +1,13 @@
 #include <memory>
 #include <cctype>
-#include "pos.h"
-#include "error.h"
-#include "token.h"
-#include "lexer.h"
+#include "pos.hpp"
+#include "error.hpp"
+#include "token.hpp"
+#include "lexer.hpp"
 
-Lexer::Lexer():
-    input(std::cin),
-    prompt(true) {}
+Lexer::Lexer(): input(std::cin, true) {}
 
-Lexer::Lexer(std::ifstream &file):
-    input(file),
-    prompt(false) {}
+Lexer::Lexer(std::ifstream &file): input(file, false) {}
 
 enum class State {
     Identifier,

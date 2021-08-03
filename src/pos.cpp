@@ -1,5 +1,5 @@
 #include <iostream>
-#include "pos.h"
+#include "pos.hpp"
 
 namespace pos {
     Pos::Pos(std::size_t line, std::size_t byte): line(line), byte(byte) {}

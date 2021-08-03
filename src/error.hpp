@@ -2,7 +2,7 @@
 #define ERROR_H
 
 #include <string>
-#include "pos.h"
+#include "pos.hpp"
 
 namespace error {
     class Error {
@@ -14,15 +14,15 @@ namespace error {
         pos::Pos pos;
     public:
         InvalidCharacter(pos::Pos &&);
-        void print(const std::string &);
-        virtual ~InvalidCharacter() = default;
+        void print(const std::string &) override;
+        virtual ~InvalidCharacter() override = default;
     };
     class UnexpectedCharacter: public Error {
         pos::Range range;
     public:
         UnexpectedCharacter(pos::Range &&);
-        void print(const std::string &);
-        virtual ~UnexpectedCharacter() = default;
+        void print(const std::string &) override;
+        virtual ~UnexpectedCharacter() override = default;
     };
 }
 #endif

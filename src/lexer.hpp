@@ -6,13 +6,11 @@
 #include <fstream>
 #include <memory>
 #include <optional>
-#include "token.h"
-#include "input.h"
+#include "token.hpp"
+#include "input.hpp"
 
 class Lexer {
     Input input;
-    bool prompt;
-    std::size_t line, byte;
 
 public:
     Lexer();

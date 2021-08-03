@@ -1,6 +1,6 @@
-#include "pos.h"
-#include "error.h"
-#include "lexer.h"
+#include "pos.hpp"
+#include "error.hpp"
+#include "lexer.hpp"
 
 int main(){
     Lexer lexer;

@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include "token.h"
+#include "token.hpp"
 
 namespace token {
     Token::Token(pos::Range &&range):

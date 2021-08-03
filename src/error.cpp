@@ -1,5 +1,5 @@
-#include "pos.h"
-#include "error.h"
+#include "pos.hpp"
+#include "error.hpp"
 #include <iostream>
 
 namespace error {

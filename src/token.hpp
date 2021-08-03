@@ -1,7 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "pos.h"
+#include "pos.hpp"
 
 namespace token {
     class Token {
