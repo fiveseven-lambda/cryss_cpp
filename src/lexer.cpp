@@ -38,9 +38,9 @@ std::optional<std::unique_ptr<token::Token>> Lexer::next(std::string &log) {
         }else if(first == '.'){
             ivalue = 0;
         }else{
-            if(first >= 0xF5) input.get(log);
             if(first >= 0xF0) input.get(log);
             if(first >= 0xE0) input.get(log);
+            if(first >= 0xC0) input.get(log);
             auto end = input.peek().first;
             throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedCharacter>(pos::Range(start, end)));
         }
