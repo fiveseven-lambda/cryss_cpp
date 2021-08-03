@@ -10,13 +10,6 @@ namespace error {
         void virtual print(const std::string &) = 0;
         virtual ~Error();
     };
-    class InvalidCharacter: public Error {
-        pos::Pos pos;
-    public:
-        InvalidCharacter(pos::Pos &&);
-        void print(const std::string &) override;
-        ~InvalidCharacter() override;
-    };
     class UnexpectedCharacter: public Error {
         pos::Range range;
     public:

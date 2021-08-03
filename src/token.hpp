@@ -9,26 +9,33 @@ namespace token {
     protected:
         Token(pos::Range &&);
     public:
+        virtual ~Token();
         // 動作確認用，あとで消す
-        void print(const std::string &);
+        virtual void print() = 0;
     };
 
     class Identifier: public Token {
         std::string name;
     public:
         Identifier(pos::Range &&, std::string &&);
+        ~Identifier() override;
+        void print() override;
     };
 
     class Integer: public Token {
         std::int32_t value;
     public:
         Integer(pos::Range &&, std::int32_t);
+        ~Integer() override;
+        void print() override;
     };
 
     class Real: public Token {
         double value;
     public:
         Real(pos::Range &&, double);
+        ~Real() override;
+        void print() override;
     };
 }
 
