@@ -1,2 +1,2 @@
 cryss:src/*
-	g++ -std=c++20 src/*.cpp -Isrc
+	g++ -std=c++20 -ocryss -Isrc src/*.cpp

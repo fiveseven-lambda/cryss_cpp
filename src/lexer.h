@@ -1,18 +1,23 @@
-#include <vector>
-#include <string>
-#include <utility>
-#include <optional>
-#include <queue>
-#include "error.h"
-#include "token.h"
+#ifndef LEXER_H
+#define LEXER_H
 
-namespace lexer {
-    class Inner {
-        std::vector<pos::Pos> comment;
-        std::optional<std::pair<pos::Pos, std::u8string>> string;
-        std::optional<Error> error;
-    public:
-        Inner();
-        void run(const std::u8string &, std::queue<std::pair<pos::Range, Token>>);
-    };
-}
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <memory>
+#include <optional>
+#include "token.h"
+#include "input.h"
+
+class Lexer {
+    Input input;
+    bool prompt;
+    std::size_t line, byte;
+
+public:
+    Lexer();
+    Lexer(std::ifstream &);
+    std::optional<std::unique_ptr<token::Token>> next(std::string &);
+};
+
+#endif
