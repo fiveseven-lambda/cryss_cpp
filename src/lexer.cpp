@@ -36,7 +36,98 @@ std::optional<std::unique_ptr<token::Token>> Lexer::next(std::string &log) {
                 }
             }
         }else if(first == '.'){
-            ivalue = 0;
+            auto [pos, c] = input.peek();
+            if('0' <= c && c <= '9'){
+                ivalue = 0;
+            }else{
+                return std::make_unique<token::Dot>(pos::Range(start, pos));
+            }
+        }else if(first == '+'){
+            return std::make_unique<token::Plus>(pos::Range(start, input.peek().first));
+        }else if(first == '-'){
+            return std::make_unique<token::Hyphen>(pos::Range(start, input.peek().first));
+        }else if(first == '*'){
+            return std::make_unique<token::Asterisk>(pos::Range(start, input.peek().first));
+        }else if(first == '/'){
+            return std::make_unique<token::Slash>(pos::Range(start, input.peek().first));
+        }else if(first == '%'){
+            return std::make_unique<token::Percent>(pos::Range(start, input.peek().first));
+        }else if(first == '^'){
+            return std::make_unique<token::Circumflex>(pos::Range(start, input.peek().first));
+        }else if(first == '='){
+            auto [pos, c] = input.peek();
+            if(c == '='){
+                input.get(log);
+                return std::make_unique<token::DoubleEqual>(pos::Range(start, input.peek().first));
+            }else{
+                return std::make_unique<token::Equal>(pos::Range(start, pos));
+            }
+        }else if(first == '!'){
+            auto [pos, c] = input.peek();
+            if(c == '='){
+                input.get(log);
+                return std::make_unique<token::ExclamationEqual>(pos::Range(start, input.peek().first));
+            }else{
+                return std::make_unique<token::Exclamation>(pos::Range(start, pos));
+            }
+        }else if(first == '<'){
+            auto [pos, c] = input.peek();
+            if(c == '='){
+                input.get(log);
+                return std::make_unique<token::LessEqual>(pos::Range(start, input.peek().first));
+            }else if(c == '<'){
+                input.get(log);
+                return std::make_unique<token::DoubleLess>(pos::Range(start, input.peek().first));
+            }else{
+                return std::make_unique<token::Less>(pos::Range(start, pos));
+            }
+        }else if(first == '>'){
+            auto [pos, c] = input.peek();
+            if(c == '='){
+                input.get(log);
+                return std::make_unique<token::GreaterEqual>(pos::Range(start, input.peek().first));
+            }else if(c == '<'){
+                input.get(log);
+                return std::make_unique<token::DoubleGreater>(pos::Range(start, input.peek().first));
+            }else{
+                return std::make_unique<token::Greater>(pos::Range(start, pos));
+            }
+        }else if(first == '&'){
+            auto [pos, c] = input.peek();
+            if(c == '&'){
+                input.get(log);
+                return std::make_unique<token::DoubleAmpersand>(pos::Range(start, input.peek().first));
+            }else{
+                return std::make_unique<token::Ampersand>(pos::Range(start, pos));
+            }
+        }else if(first == '|'){
+            auto [pos, c] = input.peek();
+            if(c == '|'){
+                input.get(log);
+                return std::make_unique<token::DoubleBar>(pos::Range(start, input.peek().first));
+            }else{
+                return std::make_unique<token::Bar>(pos::Range(start, pos));
+            }
+        }else if(first == ':'){
+            return std::make_unique<token::Colon>(pos::Range(start, input.peek().first));
+        }else if(first == ';'){
+            return std::make_unique<token::Semicolon>(pos::Range(start, input.peek().first));
+        }else if(first == ','){
+            return std::make_unique<token::Comma>(pos::Range(start, input.peek().first));
+        }else if(first == '?'){
+            return std::make_unique<token::Question>(pos::Range(start, input.peek().first));
+        }else if(first == '('){
+            return std::make_unique<token::OpeningParenthesis>(pos::Range(start, input.peek().first));
+        }else if(first == ')'){
+            return std::make_unique<token::ClosingParenthesis>(pos::Range(start, input.peek().first));
+        }else if(first == '['){
+            return std::make_unique<token::OpeningBracket>(pos::Range(start, input.peek().first));
+        }else if(first == ']'){
+            return std::make_unique<token::ClosingBracket>(pos::Range(start, input.peek().first));
+        }else if(first == '{'){
+            return std::make_unique<token::OpeningBrace>(pos::Range(start, input.peek().first));
+        }else if(first == '}'){
+            return std::make_unique<token::ClosingBrace>(pos::Range(start, input.peek().first));
         }else{
             if(first >= 0xF0) input.get(log);
             if(first >= 0xE0) input.get(log);

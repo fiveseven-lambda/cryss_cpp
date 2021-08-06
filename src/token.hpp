@@ -59,12 +59,6 @@ namespace token {
         ~Hyphen() override;
         void print() override;
     };
-    class HyphenGreater: public Token {
-    public:
-        HyphenGreater(pos::Range &&);
-        ~HyphenGreater() override;
-        void print() override;
-    };
     class Asterisk: public Token {
     public:
         Asterisk(pos::Range &&);
@@ -95,12 +89,6 @@ namespace token {
         ~Equal() override;
         void print() override;
     };
-    class EqualGreater: public Token {
-    public:
-        EqualGreater(pos::Range &&);
-        ~EqualGreater() override;
-        void print() override;
-    };
     class DoubleEqual: public Token {
     public:
         DoubleEqual(pos::Range &&);
@@ -125,6 +113,12 @@ namespace token {
         ~Less() override;
         void print() override;
     };
+    class LessEqual: public Token {
+    public:
+        LessEqual(pos::Range &&);
+        ~LessEqual() override;
+        void print() override;
+    };
     class DoubleLess: public Token {
     public:
         DoubleLess(pos::Range &&);
@@ -137,10 +131,22 @@ namespace token {
         ~Greater() override;
         void print() override;
     };
+    class GreaterEqual: public Token {
+    public:
+        GreaterEqual(pos::Range &&);
+        ~GreaterEqual() override;
+        void print() override;
+    };
     class DoubleGreater: public Token {
     public:
         DoubleGreater(pos::Range &&);
         ~DoubleGreater() override;
+        void print() override;
+    };
+    class Ampersand: public Token {
+    public:
+        Ampersand(pos::Range &&);
+        ~Ampersand() override;
         void print() override;
     };
     class DoubleAmpersand: public Token {
@@ -177,6 +183,12 @@ namespace token {
     public:
         Comma(pos::Range &&);
         ~Comma() override;
+        void print() override;
+    };
+    class Dot: public Token {
+    public:
+        Dot(pos::Range &&);
+        ~Dot() override;
         void print() override;
     };
     class Question: public Token {

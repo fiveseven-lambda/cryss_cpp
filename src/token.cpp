@@ -30,9 +30,6 @@ namespace token {
     Hyphen::Hyphen(pos::Range &&range):
         Token(std::move(range)) {}
     Hyphen::~Hyphen() = default;
-    HyphenGreater::HyphenGreater(pos::Range &&range):
-        Token(std::move(range)) {}
-    HyphenGreater::~HyphenGreater() = default;
     Asterisk::Asterisk(pos::Range &&range):
         Token(std::move(range)) {}
     Asterisk::~Asterisk() = default;
@@ -48,9 +45,6 @@ namespace token {
     Equal::Equal(pos::Range &&range):
         Token(std::move(range)) {}
     Equal::~Equal() = default;
-    EqualGreater::EqualGreater(pos::Range &&range):
-        Token(std::move(range)) {}
-    EqualGreater::~EqualGreater() = default;
     DoubleEqual::DoubleEqual(pos::Range &&range):
         Token(std::move(range)) {}
     DoubleEqual::~DoubleEqual() = default;
@@ -63,15 +57,24 @@ namespace token {
     Less::Less(pos::Range &&range):
         Token(std::move(range)) {}
     Less::~Less() = default;
+    LessEqual::LessEqual(pos::Range &&range):
+        Token(std::move(range)) {}
+    LessEqual::~LessEqual() = default;
     DoubleLess::DoubleLess(pos::Range &&range):
         Token(std::move(range)) {}
     DoubleLess::~DoubleLess() = default;
     Greater::Greater(pos::Range &&range):
         Token(std::move(range)) {}
     Greater::~Greater() = default;
+    GreaterEqual::GreaterEqual(pos::Range &&range):
+        Token(std::move(range)) {}
+    GreaterEqual::~GreaterEqual() = default;
     DoubleGreater::DoubleGreater(pos::Range &&range):
         Token(std::move(range)) {}
     DoubleGreater::~DoubleGreater() = default;
+    Ampersand::Ampersand(pos::Range &&range):
+        Token(std::move(range)) {}
+    Ampersand::~Ampersand() = default;
     DoubleAmpersand::DoubleAmpersand(pos::Range &&range):
         Token(std::move(range)) {}
     DoubleAmpersand::~DoubleAmpersand() = default;
@@ -90,6 +93,9 @@ namespace token {
     Comma::Comma(pos::Range &&range):
         Token(std::move(range)) {}
     Comma::~Comma() = default;
+    Dot::Dot(pos::Range &&range):
+        Token(std::move(range)) {}
+    Dot::~Dot() = default;
     Question::Question(pos::Range &&range):
         Token(std::move(range)) {}
     Question::~Question() = default;
@@ -131,9 +137,6 @@ namespace token {
     void Hyphen::print(){
         std::cout << "Hyphen" << std::endl;
     }
-    void HyphenGreater::print(){
-        std::cout << "HyphenGreater" << std::endl;
-    }
     void Asterisk::print(){
         std::cout << "Asterisk" << std::endl;
     }
@@ -149,9 +152,6 @@ namespace token {
     void Equal::print(){
         std::cout << "Equal" << std::endl;
     }
-    void EqualGreater::print(){
-        std::cout << "EqualGreater" << std::endl;
-    }
     void DoubleEqual::print(){
         std::cout << "DoubleEqual" << std::endl;
     }
@@ -164,14 +164,23 @@ namespace token {
     void Less::print(){
         std::cout << "Less" << std::endl;
     }
+    void LessEqual::print(){
+        std::cout << "LessEqual" << std::endl;
+    }
     void DoubleLess::print(){
         std::cout << "DoubleLess" << std::endl;
     }
     void Greater::print(){
         std::cout << "Greater" << std::endl;
     }
+    void GreaterEqual::print(){
+        std::cout << "GreaterEqual" << std::endl;
+    }
     void DoubleGreater::print(){
         std::cout << "DoubleGreater" << std::endl;
+    }
+    void Ampersand::print(){
+        std::cout << "Ampersand" << std::endl;
     }
     void DoubleAmpersand::print(){
         std::cout << "DoubleAmpersand" << std::endl;
@@ -190,6 +199,9 @@ namespace token {
     }
     void Comma::print(){
         std::cout << "Comma" << std::endl;
+    }
+    void Dot::print(){
+        std::cout << "Dot" << std::endl;
     }
     void Question::print(){
         std::cout << "Question" << std::endl;
