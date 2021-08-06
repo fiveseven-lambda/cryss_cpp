@@ -29,7 +29,7 @@ namespace pos {
         return os << "line " << range.get_start().get_line() << "-" << range.get_end().get_line();
     }
     Range operator+(Range left, const Range &right) {
-        return left += right;
+        return std::move(left += right);
     }
     std::string Range::substr(const std::string &log){
         return log.substr(start.get_byte(), end.get_byte());
