@@ -14,8 +14,12 @@ namespace pos {
 
     class Range {
         Pos start, end;
+        Range(const Range &) = delete;
+        Range &operator=(const Range &) = delete;
     public:
         Range(Pos, Pos);
+        Range(Range &&);
+        Range &operator=(Range &&);
         Pos get_start() const, get_end() const;
         Range &operator+=(const Range &);
         std::string substr(const std::string &);

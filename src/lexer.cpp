@@ -21,7 +21,7 @@ std::optional<std::unique_ptr<token::Token>> &Lexer::peek(std::string &log) {
         while(std::isspace(input.peek().second)) input.get(log);
         auto [start, first] = input.get(log);
         if(first == EOF){
-            peeked = std::make_optional(std::optional<std::unique_ptr<token::Token>>());
+            peeked = std::make_optional<std::optional<std::unique_ptr<token::Token>>>();
         }else if(std::isalpha(first)){
             std::string ret(1, first);
             while(std::isalnum(input.peek().second)) ret.push_back(input.get(log).second);

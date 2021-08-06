@@ -42,7 +42,7 @@ namespace token {
     class String: public Token {
         std::string value;
     public:
-        String(pos::Range &&, std::string);
+        String(pos::Range &&, std::string &&);
         ~String() override;
         void print() override;
     };

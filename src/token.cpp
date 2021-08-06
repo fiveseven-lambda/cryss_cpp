@@ -6,7 +6,7 @@
 
 namespace token {
     Token::Token(pos::Range &&range):
-        range(range) {}
+        range(std::move(range)) {}
     Token::~Token() = default;
 
     Identifier::Identifier(pos::Range &&range, std::string &&name):
@@ -21,7 +21,7 @@ namespace token {
         Token(std::move(range)),
         value(value) {}
     Real::~Real() = default;
-    String::String(pos::Range &&range, std::string value):
+    String::String(pos::Range &&range, std::string &&value):
         Token(std::move(range)),
         value(value) {}
     String::~String() = default;

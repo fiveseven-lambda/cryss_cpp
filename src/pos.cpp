@@ -13,6 +13,8 @@ namespace pos {
         return os << "line " << pos.get_line();
     }
     Range::Range(Pos start, Pos end): start(start), end(end) {}
+    Range::Range(Range &&) = default;
+    Range &Range::operator=(Range &&) = default;
     Range &Range::operator+=(const Range &other) {
         end = other.end;
         return *this;
