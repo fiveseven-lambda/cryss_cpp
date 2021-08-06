@@ -14,7 +14,6 @@ class Input {
 public:
     Input(std::istream &, bool);
     std::pair<pos::Pos, int> peek(), get(std::string &);
-    std::size_t get_line(), get_byte();
 };
 
 #endif

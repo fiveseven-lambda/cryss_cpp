@@ -29,9 +29,3 @@ std::pair<pos::Pos, int> Input::get(std::string &log){
     }
     return ret;
 }
-std::size_t Input::get_line(){
-    return line;
-}
-std::size_t Input::get_byte(){
-    return byte;
-}

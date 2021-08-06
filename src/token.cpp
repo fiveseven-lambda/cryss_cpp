@@ -8,6 +8,7 @@ namespace token {
     Token::Token(pos::Range &&range):
         range(range) {}
     Token::~Token() = default;
+
     Identifier::Identifier(pos::Range &&range, std::string &&name):
         Token(std::move(range)),
         name(name) {}
@@ -119,6 +120,10 @@ namespace token {
     ClosingBrace::~ClosingBrace() = default;
 
     // 動作確認用，あとで消す
+    void Token::print_all(const std::string &log){
+        print();
+        std::cout << range << ": " << range.substr(log) << std::endl;
+    }
     void Identifier::print(){
         std::cout << "Identifier(" << name << ")" << std::endl;
     }

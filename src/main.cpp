@@ -7,7 +7,7 @@ int main(){
     std::string log;
     try {
         while(auto optional = lexer.next(log)) {
-            optional.value()->print();
+            optional.value()->print_all(log);
         }
     } catch(std::unique_ptr<error::Error> &err) {
         err->print(log);
