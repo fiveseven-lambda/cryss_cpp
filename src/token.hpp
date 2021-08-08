@@ -10,6 +10,8 @@ namespace token {
         Token(pos::Range &&);
     public:
         virtual ~Token();
+        Token(const Token &) = delete;
+        Token &operator=(const Token &) = delete;
         // 動作確認用，あとで消す
         virtual void print() = 0;
         void print_all(const std::string &);

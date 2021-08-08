@@ -1,5 +1,5 @@
-#ifndef POS_H
-#define POS_H
+#ifndef POS_HPP
+#define POS_HPP
 #include <cstddef>
 #include <string>
 
