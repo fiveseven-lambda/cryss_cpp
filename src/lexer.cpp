@@ -1,5 +1,6 @@
 #include <memory>
 #include <cctype>
+#include <vector>
 #include "pos.hpp"
 #include "error.hpp"
 #include "token.hpp"
@@ -62,8 +63,30 @@ std::optional<std::unique_ptr<token::Token>> &Lexer::peek(std::string &log) {
                 peeked = std::make_unique<token::Asterisk>(pos::Range(start, input.peek().first));
                 goto end;
             }else if(first == '/'){
-                peeked = std::make_unique<token::Slash>(pos::Range(start, input.peek().first));
-                goto end;
+                auto [pos, c] = input.peek();
+                if(c == '*'){
+                    std::vector<pos::Pos> comment(1, start);
+                    while(!comment.empty()){
+                        auto [pos, c] = input.get(log);
+                        if(c == '*'){
+                            if(input.peek().second == '/'){
+                                input.get(log);
+                                comment.pop_back();
+                            }
+                        }else if(c == '/'){
+                            if(input.peek().second == '*'){
+                                input.get(log);
+                                comment.push_back(pos);
+                            }
+                        }
+                    }
+                }else if(c == '/'){
+                    while(input.get(log).second != '\n');
+                }else{
+                    peeked = std::make_unique<token::Slash>(pos::Range(start, input.peek().first));
+                    goto end;
+                }
+                return peek(log);
             }else if(first == '%'){
                 peeked = std::make_unique<token::Percent>(pos::Range(start, input.peek().first));
                 goto end;
