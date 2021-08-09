@@ -2,6 +2,7 @@
 #define SYNTAX_HPP
 
 #include <string>
+#include <memory>
 
 namespace syntax {
     class Expression {
@@ -39,6 +40,19 @@ namespace syntax {
     public:
         String(std::string &&);
         ~String() override;
+        void print(int) override;
+    };
+    enum class UnaryOperator {
+        Minus,
+        Reciprocal,
+        Not
+    };
+    class Unary: public Expression {
+        UnaryOperator op;
+        std::unique_ptr<Expression> operand;
+    public:
+        Unary(UnaryOperator, std::unique_ptr<Expression>);
+        ~Unary() override;
         void print(int) override;
     };
 }

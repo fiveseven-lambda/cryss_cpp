@@ -17,6 +17,7 @@ namespace token {
         Token(const Token &) = delete;
         Token &operator=(const Token &) = delete;
         virtual std::optional<std::unique_ptr<syntax::Expression>> term();
+        virtual std::optional<syntax::UnaryOperator> unary();
         // 動作確認用，あとで消す
         virtual void print() = 0;
         void print_all(const std::string &);
@@ -69,6 +70,7 @@ namespace token {
     public:
         Hyphen(pos::Range &&);
         ~Hyphen() override;
+        std::optional<syntax::UnaryOperator> unary() override;
         void print() override;
     };
     class Asterisk: public Token {
@@ -81,6 +83,7 @@ namespace token {
     public:
         Slash(pos::Range &&);
         ~Slash() override;
+        std::optional<syntax::UnaryOperator> unary() override;
         void print() override;
     };
     class Percent: public Token {
@@ -111,6 +114,7 @@ namespace token {
     public:
         Exclamation(pos::Range &&);
         ~Exclamation() override;
+        std::optional<syntax::UnaryOperator> unary() override;
         void print() override;
     };
     class ExclamationEqual: public Token {

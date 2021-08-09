@@ -16,4 +16,10 @@ namespace error {
         std::cerr << "unexpected token `" << range.substr(log) << "` at " << range << std::endl;
     }
     UnexpectedToken::~UnexpectedToken() = default;
+    EmptyExpressionAfterUnaryOperator::EmptyExpressionAfterUnaryOperator(pos::Range &&range):
+        range(std::move(range)) {}
+    void EmptyExpressionAfterUnaryOperator::print(const std::string &log){
+        std::cerr << "empty expression after unary operator `" << range.substr(log) << "` at " << range << std::endl;
+    }
+    EmptyExpressionAfterUnaryOperator::~EmptyExpressionAfterUnaryOperator() = default;
 }

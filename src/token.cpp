@@ -137,6 +137,18 @@ namespace token {
     std::optional<std::unique_ptr<syntax::Expression>> String::term(){
         return std::make_unique<syntax::String>(std::move(value));
     }
+    std::optional<syntax::UnaryOperator> Token::unary() {
+        return std::nullopt;
+    }
+    std::optional<syntax::UnaryOperator> Hyphen::unary() {
+        return syntax::UnaryOperator::Minus;
+    }
+    std::optional<syntax::UnaryOperator> Slash::unary() {
+        return syntax::UnaryOperator::Reciprocal;
+    }
+    std::optional<syntax::UnaryOperator> Exclamation::unary() {
+        return syntax::UnaryOperator::Not;
+    }
 
     // 動作確認用，あとで消す
     void Token::print_all(const std::string &log){

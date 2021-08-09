@@ -24,5 +24,12 @@ namespace error {
         void print(const std::string &) override;
         ~UnexpectedToken() override;
     };
+    class EmptyExpressionAfterUnaryOperator: public Error {
+        pos::Range range;
+    public:
+        EmptyExpressionAfterUnaryOperator(pos::Range &&);
+        void print(const std::string &) override;
+        ~EmptyExpressionAfterUnaryOperator() override;
+    };
 }
 #endif

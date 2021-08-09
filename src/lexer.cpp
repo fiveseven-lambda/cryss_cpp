@@ -25,7 +25,7 @@ std::optional<std::unique_ptr<token::Token>> &Lexer::peek(std::string &log) {
             peeked = std::make_optional<std::optional<std::unique_ptr<token::Token>>>();
         }else if(std::isalpha(first)){
             std::string ret(1, std::char_traits<char>::to_char_type(first));
-            while(std::isalnum(input.peek().second)) ret.push_back(input.get(log).second);
+            while(std::isalnum(input.peek().second)) ret.push_back(std::char_traits<char>::to_char_type(input.get(log).second));
             auto end = input.peek().first;
             peeked = std::make_unique<token::Identifier>(pos::Range(start, end), std::move(ret));
         }else{
