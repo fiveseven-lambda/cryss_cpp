@@ -119,6 +119,22 @@ namespace token {
         Token(std::move(range)) {}
     ClosingBrace::~ClosingBrace() = default;
 
+    std::optional<std::unique_ptr<syntax::Expression>> Token::term(){
+        return std::nullopt;
+    }
+    std::optional<std::unique_ptr<syntax::Expression>> Identifier::term(){
+        return std::make_unique<syntax::Identifier>(std::move(name));
+    }
+    std::optional<std::unique_ptr<syntax::Expression>> Integer::term(){
+        return std::make_unique<syntax::Integer>(value);
+    }
+    std::optional<std::unique_ptr<syntax::Expression>> Real::term(){
+        return std::make_unique<syntax::Real>(value);
+    }
+    std::optional<std::unique_ptr<syntax::Expression>> String::term(){
+        return std::make_unique<syntax::String>(std::move(value));
+    }
+
     // 動作確認用，あとで消す
     void Token::print_all(const std::string &log){
         print();

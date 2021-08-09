@@ -1,7 +1,10 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <optional>
+#include <memory>
 #include "pos.hpp"
+#include "syntax.hpp"
 
 namespace token {
     class Token {
@@ -12,6 +15,7 @@ namespace token {
         virtual ~Token();
         Token(const Token &) = delete;
         Token &operator=(const Token &) = delete;
+        virtual std::optional<std::unique_ptr<syntax::Expression>> term();
         // 動作確認用，あとで消す
         virtual void print() = 0;
         void print_all(const std::string &);
@@ -22,6 +26,7 @@ namespace token {
     public:
         Identifier(pos::Range &&, std::string &&);
         ~Identifier() override;
+        std::optional<std::unique_ptr<syntax::Expression>> term() override;
         void print() override;
     };
 
@@ -30,6 +35,7 @@ namespace token {
     public:
         Integer(pos::Range &&, std::int32_t);
         ~Integer() override;
+        std::optional<std::unique_ptr<syntax::Expression>> term() override;
         void print() override;
     };
 
@@ -38,6 +44,7 @@ namespace token {
     public:
         Real(pos::Range &&, double);
         ~Real() override;
+        std::optional<std::unique_ptr<syntax::Expression>> term() override;
         void print() override;
     };
 
@@ -46,6 +53,7 @@ namespace token {
     public:
         String(pos::Range &&, std::string &&);
         ~String() override;
+        std::optional<std::unique_ptr<syntax::Expression>> term() override;
         void print() override;
     };
 
