@@ -10,4 +10,10 @@ namespace error {
         std::cerr << "unexpected character `" << range.substr(log) << "` at " << range << std::endl;
     }
     UnexpectedCharacter::~UnexpectedCharacter() = default;
+    UnexpectedToken::UnexpectedToken(pos::Range &&range):
+        range(std::move(range)) {}
+    void UnexpectedToken::print(const std::string &log){
+        std::cerr << "unexpected token `" << range.substr(log) << "` at " << range << std::endl;
+    }
+    UnexpectedToken::~UnexpectedToken() = default;
 }

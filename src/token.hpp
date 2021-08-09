@@ -13,6 +13,7 @@ namespace token {
         Token(pos::Range &&);
     public:
         virtual ~Token();
+        pos::Range get_range();
         Token(const Token &) = delete;
         Token &operator=(const Token &) = delete;
         virtual std::optional<std::unique_ptr<syntax::Expression>> term();

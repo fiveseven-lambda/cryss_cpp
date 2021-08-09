@@ -17,5 +17,12 @@ namespace error {
         void print(const std::string &) override;
         ~UnexpectedCharacter() override;
     };
+    class UnexpectedToken: public Error {
+        pos::Range range;
+    public:
+        UnexpectedToken(pos::Range &&);
+        void print(const std::string &) override;
+        ~UnexpectedToken() override;
+    };
 }
 #endif

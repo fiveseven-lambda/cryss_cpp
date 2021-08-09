@@ -8,6 +8,9 @@ namespace token {
     Token::Token(pos::Range &&range):
         range(std::move(range)) {}
     Token::~Token() = default;
+    pos::Range Token::get_range() {
+        return std::move(range);
+    }
 
     Identifier::Identifier(pos::Range &&range, std::string &&name):
         Token(std::move(range)),

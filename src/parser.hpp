@@ -6,6 +6,9 @@
 #include "syntax.hpp"
 #include "lexer.hpp"
 
+// 最終的にここには全体のパーサだけ残す
+
+// これはいずれ parser.cpp 内にうつす
 std::optional<std::unique_ptr<syntax::Expression>> parse_factor(Lexer &, std::string &);
 
 #endif
