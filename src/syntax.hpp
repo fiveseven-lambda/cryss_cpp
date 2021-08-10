@@ -48,7 +48,8 @@ namespace syntax {
     enum class UnaryOperator {
         Minus,
         Reciprocal,
-        Not
+        Not,
+        Print
     };
     std::ostream &operator<<(std::ostream &, const UnaryOperator &);
     class Unary: public Expression {
@@ -57,6 +58,24 @@ namespace syntax {
     public:
         Unary(pos::Range &&, UnaryOperator, std::unique_ptr<Expression>);
         ~Unary() override;
+        void print(int) override;
+    };
+    enum class BinaryOperator {
+        Add,
+        Sub,
+        Mul,
+        Div,
+        Rem,
+        Pow,
+        Equal,
+        NotEqual
+    };
+    class Binary: public Expression {
+        BinaryOperator op;
+        std::unique_ptr<Expression> left, right;
+    public:
+        Binary(pos::Range &&, BinaryOperator, std::unique_ptr<Expression>, std::unique_ptr<Expression>);
+        ~Binary() override;
         void print(int) override;
     };
 }

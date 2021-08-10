@@ -50,12 +50,30 @@ namespace syntax {
             case UnaryOperator::Minus: return os << "-";
             case UnaryOperator::Reciprocal: return os << "/";
             case UnaryOperator::Not: return os << "!";
+            case UnaryOperator::Print: return os << "?";
         }
-        // enum class UnaryOperator : int は Minus/Reciprocal/Not いずれでもない値をとる可能性がある
         std::terminate();
     }
     void Unary::print(int indent){
         std::cout << std::setw(indent) << "" << op << "\t" << get_range() << std::endl;
         operand->print(indent + 1);
+    }
+    std::ostream &operator<<(std::ostream &os, const BinaryOperator &op){
+        switch(op){
+            case BinaryOperator::Add: return os << "+";
+            case BinaryOperator::Sub: return os << "-";
+            case BinaryOperator::Mul: return os << "*";
+            case BinaryOperator::Div: return os << "/";
+            case BinaryOperator::Rem: return os << "%";
+            case BinaryOperator::Pow: return os << "^";
+            case BinaryOperator::Equal: return os << "==";
+            case BinaryOperator::NotEqual: return os << "!=";
+        }
+        std::terminate();
+    }
+    void Binary::print(int indent){
+        std::cout << std::setw(indent) << "" << op << "\t" << get_range() << std::endl;
+        left->print(indent + 1);
+        right->print(indent + 1);
     }
 }

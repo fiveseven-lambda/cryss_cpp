@@ -122,31 +122,64 @@ namespace token {
         Token(std::move(range)) {}
     ClosingBrace::~ClosingBrace() = default;
 
-    std::optional<std::unique_ptr<syntax::Expression>> Token::term(){
+    std::optional<std::unique_ptr<syntax::Expression>> Token::factor(){
         return std::nullopt;
     }
-    std::optional<std::unique_ptr<syntax::Expression>> Identifier::term(){
+    std::optional<std::unique_ptr<syntax::Expression>> Identifier::factor(){
         return std::make_unique<syntax::Identifier>(get_range(), std::move(name));
     }
-    std::optional<std::unique_ptr<syntax::Expression>> Integer::term(){
+    std::optional<std::unique_ptr<syntax::Expression>> Integer::factor(){
         return std::make_unique<syntax::Integer>(get_range(), value);
     }
-    std::optional<std::unique_ptr<syntax::Expression>> Real::term(){
+    std::optional<std::unique_ptr<syntax::Expression>> Real::factor(){
         return std::make_unique<syntax::Real>(get_range(), value);
     }
-    std::optional<std::unique_ptr<syntax::Expression>> String::term(){
+    std::optional<std::unique_ptr<syntax::Expression>> String::factor(){
         return std::make_unique<syntax::String>(get_range(), std::move(value));
     }
-    std::optional<syntax::UnaryOperator> Token::unary() {
+    std::optional<syntax::UnaryOperator> Token::unary_operator() {
         return std::nullopt;
     }
-    std::optional<syntax::UnaryOperator> Hyphen::unary() {
+    std::optional<syntax::UnaryOperator> Hyphen::unary_operator() {
         return syntax::UnaryOperator::Minus;
     }
-    std::optional<syntax::UnaryOperator> Slash::unary() {
+    std::optional<syntax::UnaryOperator> Slash::unary_operator() {
         return syntax::UnaryOperator::Reciprocal;
     }
-    std::optional<syntax::UnaryOperator> Exclamation::unary() {
+    std::optional<syntax::UnaryOperator> Exclamation::unary_operator() {
         return syntax::UnaryOperator::Not;
+    }
+    std::optional<syntax::BinaryOperator> Token::binary_operator() {
+        return std::nullopt;
+    }
+    std::optional<syntax::BinaryOperator> Plus::binary_operator() {
+        return syntax::BinaryOperator::Add;
+    }
+    std::optional<syntax::BinaryOperator> Hyphen::binary_operator() {
+        return syntax::BinaryOperator::Sub;
+    }
+    std::optional<syntax::BinaryOperator> Asterisk::binary_operator() {
+        return syntax::BinaryOperator::Mul;
+    }
+    std::optional<syntax::BinaryOperator> Slash::binary_operator() {
+        return syntax::BinaryOperator::Div;
+    }
+    std::optional<syntax::BinaryOperator> Percent::binary_operator() {
+        return syntax::BinaryOperator::Rem;
+    }
+    std::optional<syntax::BinaryOperator> Circumflex::binary_operator() {
+        return syntax::BinaryOperator::Pow;
+    }
+    std::optional<syntax::BinaryOperator> DoubleEqual::binary_operator() {
+        return syntax::BinaryOperator::Equal;
+    }
+    std::optional<syntax::BinaryOperator> ExclamationEqual::binary_operator() {
+        return syntax::BinaryOperator::NotEqual;
+    }
+    bool Token::question(){
+        return false;
+    }
+    bool Question::question(){
+        return true;
     }
 }

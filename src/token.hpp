@@ -16,8 +16,10 @@ namespace token {
         pos::Range get_range();
         Token(const Token &) = delete;
         Token &operator=(const Token &) = delete;
-        virtual std::optional<std::unique_ptr<syntax::Expression>> term();
-        virtual std::optional<syntax::UnaryOperator> unary();
+        virtual std::optional<std::unique_ptr<syntax::Expression>> factor();
+        virtual std::optional<syntax::UnaryOperator> unary_operator();
+        virtual std::optional<syntax::BinaryOperator> binary_operator();
+        virtual bool question();
     };
 
     class Identifier: public Token {
@@ -25,7 +27,7 @@ namespace token {
     public:
         Identifier(pos::Range &&, std::string &&);
         ~Identifier() override;
-        std::optional<std::unique_ptr<syntax::Expression>> term() override;
+        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
     };
 
     class Integer: public Token {
@@ -33,7 +35,7 @@ namespace token {
     public:
         Integer(pos::Range &&, std::int32_t);
         ~Integer() override;
-        std::optional<std::unique_ptr<syntax::Expression>> term() override;
+        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
     };
 
     class Real: public Token {
@@ -41,7 +43,7 @@ namespace token {
     public:
         Real(pos::Range &&, double);
         ~Real() override;
-        std::optional<std::unique_ptr<syntax::Expression>> term() override;
+        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
     };
 
     class String: public Token {
@@ -49,7 +51,7 @@ namespace token {
     public:
         String(pos::Range &&, std::string &&);
         ~String() override;
-        std::optional<std::unique_ptr<syntax::Expression>> term() override;
+        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
     };
 
 
@@ -57,33 +59,39 @@ namespace token {
     public:
         Plus(pos::Range &&);
         ~Plus() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Hyphen: public Token {
     public:
         Hyphen(pos::Range &&);
         ~Hyphen() override;
-        std::optional<syntax::UnaryOperator> unary() override;
+        std::optional<syntax::UnaryOperator> unary_operator() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Asterisk: public Token {
     public:
         Asterisk(pos::Range &&);
         ~Asterisk() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Slash: public Token {
     public:
         Slash(pos::Range &&);
         ~Slash() override;
-        std::optional<syntax::UnaryOperator> unary() override;
+        std::optional<syntax::UnaryOperator> unary_operator() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Percent: public Token {
     public:
         Percent(pos::Range &&);
         ~Percent() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Circumflex: public Token {
     public:
         Circumflex(pos::Range &&);
         ~Circumflex() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Equal: public Token {
     public:
@@ -94,17 +102,19 @@ namespace token {
     public:
         DoubleEqual(pos::Range &&);
         ~DoubleEqual() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Exclamation: public Token {
     public:
         Exclamation(pos::Range &&);
         ~Exclamation() override;
-        std::optional<syntax::UnaryOperator> unary() override;
+        std::optional<syntax::UnaryOperator> unary_operator() override;
     };
     class ExclamationEqual: public Token {
     public:
         ExclamationEqual(pos::Range &&);
         ~ExclamationEqual() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Less: public Token {
     public:
@@ -180,6 +190,7 @@ namespace token {
     public:
         Question(pos::Range &&);
         ~Question() override;
+        bool question() override;
     };
     class OpeningParenthesis: public Token {
     public:
