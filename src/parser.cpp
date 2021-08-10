@@ -3,7 +3,8 @@
 
 std::optional<std::unique_ptr<syntax::Expression>>
     parse_prefix(Lexer &, std::string &),
-    parse_factor(Lexer &, std::string &);
+    parse_factor(Lexer &, std::string &),
+    parse_binary_operator(Lexer &lexer, std::string &log, int precedence);
 
 std::optional<std::unique_ptr<syntax::Expression>> parse_prefix(Lexer &lexer, std::string &log){
     auto optional = lexer.next(log);
@@ -19,6 +20,14 @@ std::optional<std::unique_ptr<syntax::Expression>> parse_prefix(Lexer &lexer, st
             return std::make_unique<syntax::Unary>(std::move(range), op.value(), std::move(operand.value()));
         }else{
             throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::EmptyExpressionAfterUnaryOperator>(token->get_range()));
+        }
+    }else if(token->opening_parenthesis()){
+        if(auto expression = parse_expression(lexer, log); expression){
+            auto optional_close = lexer.next(log);
+            auto range = token->get_range() + optional_close.value()->get_range();
+            return std::make_unique<syntax::Group>(std::move(range), std::move(expression.value()));
+        }else{
+            throw;
         }
     }else{
         throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedToken>(token->get_range()));
@@ -65,4 +74,8 @@ std::optional<std::unique_ptr<syntax::Expression>> parse_binary_operator(Lexer &
             return std::move(left);
         }
     }
+}
+
+std::optional<std::unique_ptr<syntax::Expression>> parse_expression(Lexer &lexer, std::string &log){
+    return parse_binary_operator(lexer, log, 0);
 }

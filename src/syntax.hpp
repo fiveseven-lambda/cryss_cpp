@@ -92,6 +92,13 @@ namespace syntax {
         ~Binary() override;
         void print(int) override;
     };
+    class Group: public Expression {
+        std::unique_ptr<Expression> expression;
+    public:
+        Group(pos::Range &&, std::unique_ptr<Expression>);
+        ~Group() override;
+        void print(int) override;
+    };
 }
 
 #endif

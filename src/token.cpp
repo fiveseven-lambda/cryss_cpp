@@ -218,10 +218,8 @@ namespace token {
     std::optional<syntax::BinaryOperator> DoubleBar::binary_operator() {
         return syntax::BinaryOperator::LogicalOr;
     }
-    bool Token::question(){
-        return false;
-    }
-    bool Question::question(){
-        return true;
-    }
+    bool Token::question(){ return false; }
+    bool Token::opening_parenthesis(){ return false; }
+    bool Question::question(){ return true; }
+    bool OpeningParenthesis::opening_parenthesis(){ return true; }
 }

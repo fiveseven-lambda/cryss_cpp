@@ -9,6 +9,6 @@
 // 最終的にここには全体のパーサだけ残す
 
 // これはいずれ parser.cpp 内にうつす
-std::optional<std::unique_ptr<syntax::Expression>> parse_binary_operator(Lexer &, std::string &, int = 0);
+std::optional<std::unique_ptr<syntax::Expression>> parse_expression(Lexer &, std::string &);
 
 #endif

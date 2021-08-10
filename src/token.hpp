@@ -19,7 +19,7 @@ namespace token {
         virtual std::optional<std::unique_ptr<syntax::Expression>> factor();
         virtual std::optional<syntax::UnaryOperator> unary_operator();
         virtual std::optional<syntax::BinaryOperator> binary_operator();
-        virtual bool question();
+        virtual bool question(), opening_parenthesis();
     };
 
     class Identifier: public Token {
@@ -218,6 +218,7 @@ namespace token {
     public:
         OpeningParenthesis(pos::Range &&);
         ~OpeningParenthesis() override;
+        bool opening_parenthesis() override;
     };
     class ClosingParenthesis: public Token {
     public:

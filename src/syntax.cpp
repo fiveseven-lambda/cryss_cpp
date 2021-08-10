@@ -28,15 +28,19 @@ namespace syntax {
         op(op),
         operand(std::move(operand)) {}
     Unary::~Unary() = default;
-    pos::Range Expression::get_range(){
-        return std::move(range);
-    }
     Binary::Binary(pos::Range &&range, BinaryOperator op, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right):
         Expression(std::move(range)),
         op(op),
         left(std::move(left)),
         right(std::move(right)) {}
     Binary::~Binary() = default;
+    Group::Group(pos::Range &&range, std::unique_ptr<Expression> expression):
+        Expression(std::move(range)),
+        expression(std::move(expression)) {}
+    Group::~Group() = default;
+    pos::Range Expression::get_range(){
+        return std::move(range);
+    }
 
     // FOR DEBUG
     void Identifier::print(int indent){
@@ -118,5 +122,10 @@ namespace syntax {
         left->print(indent + 1);
         std::cout << std::setw(indent) << "" << op << "\t" << get_range() << std::endl;
         right->print(indent + 1);
+    }
+    void Group::print(int indent){
+        std::cout << std::setw(indent) << "" << "(\t" << get_range() << std::endl;
+        expression->print(indent + 1);
+        std::cout << std::setw(indent) << "" << ")\t" << get_range() << std::endl;
     }
 }
