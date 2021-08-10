@@ -50,6 +50,7 @@ namespace syntax {
         Reciprocal,
         Not
     };
+    std::ostream &operator<<(std::ostream &, const UnaryOperator &);
     class Unary: public Expression {
         UnaryOperator op;
         std::unique_ptr<Expression> operand;

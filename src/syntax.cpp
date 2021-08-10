@@ -49,8 +49,10 @@ namespace syntax {
         switch(op){
             case UnaryOperator::Minus: return os << "-";
             case UnaryOperator::Reciprocal: return os << "/";
-            case UnaryOperator::Not: default: return os << "!";
+            case UnaryOperator::Not: return os << "!";
         }
+        // enum class UnaryOperator : int は Minus/Reciprocal/Not いずれでもない値をとる可能性がある
+        std::terminate();
     }
     void Unary::print(int indent){
         std::cout << std::setw(indent) << "" << op << "\t" << get_range() << std::endl;
