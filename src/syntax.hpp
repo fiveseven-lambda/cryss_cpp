@@ -3,42 +3,45 @@
 
 #include <string>
 #include <memory>
+#include "pos.hpp"
 
 namespace syntax {
     class Expression {
+        pos::Range range;
     public:
         virtual ~Expression();
-        Expression();
+        Expression(pos::Range &&);
         Expression(const Expression &) = delete;
         Expression &operator=(const Expression &) = delete;
+        pos::Range get_range();
         // FOR DEBUG
         virtual void print(int = 0) = 0;
     };
     class Identifier: public Expression {
         std::string name;
     public:
-        Identifier(std::string &&);
+        Identifier(pos::Range &&, std::string &&);
         ~Identifier() override;
         void print(int) override;
     };
     class Integer: public Expression {
         int value;
     public:
-        Integer(int);
+        Integer(pos::Range &&, int);
         ~Integer() override;
         void print(int) override;
     };
     class Real: public Expression {
         double value;
     public:
-        Real(double);
+        Real(pos::Range &&, double);
         ~Real() override;
         void print(int) override;
     };
     class String: public Expression {
         std::string value;
     public:
-        String(std::string &&);
+        String(pos::Range &&, std::string &&);
         ~String() override;
         void print(int) override;
     };
@@ -51,7 +54,7 @@ namespace syntax {
         UnaryOperator op;
         std::unique_ptr<Expression> operand;
     public:
-        Unary(UnaryOperator, std::unique_ptr<Expression>);
+        Unary(pos::Range &&, UnaryOperator, std::unique_ptr<Expression>);
         ~Unary() override;
         void print(int) override;
     };

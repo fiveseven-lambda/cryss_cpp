@@ -126,16 +126,16 @@ namespace token {
         return std::nullopt;
     }
     std::optional<std::unique_ptr<syntax::Expression>> Identifier::term(){
-        return std::make_unique<syntax::Identifier>(std::move(name));
+        return std::make_unique<syntax::Identifier>(get_range(), std::move(name));
     }
     std::optional<std::unique_ptr<syntax::Expression>> Integer::term(){
-        return std::make_unique<syntax::Integer>(value);
+        return std::make_unique<syntax::Integer>(get_range(), value);
     }
     std::optional<std::unique_ptr<syntax::Expression>> Real::term(){
-        return std::make_unique<syntax::Real>(value);
+        return std::make_unique<syntax::Real>(get_range(), value);
     }
     std::optional<std::unique_ptr<syntax::Expression>> String::term(){
-        return std::make_unique<syntax::String>(std::move(value));
+        return std::make_unique<syntax::String>(get_range(), std::move(value));
     }
     std::optional<syntax::UnaryOperator> Token::unary() {
         return std::nullopt;

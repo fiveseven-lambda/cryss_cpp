@@ -11,7 +11,8 @@ std::optional<std::unique_ptr<syntax::Expression>> parse_factor(Lexer &lexer, st
         return std::move(term.value());
     }else if(auto op = token->unary(); op){
         if(auto operand = parse_factor(lexer, log); operand){
-            return std::make_unique<syntax::Unary>(op.value(), std::move(operand.value()));
+            auto range = token->get_range() + operand.value()->get_range();
+            return std::make_unique<syntax::Unary>(std::move(range), op.value(), std::move(operand.value()));
         }else{
             throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::EmptyExpressionAfterUnaryOperator>(token->get_range()));
         }

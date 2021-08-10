@@ -26,7 +26,9 @@ namespace pos {
         return end;
     }
     std::ostream &operator<<(std::ostream &os, const Range &range){
-        return os << "line " << range.get_start().get_line() << "-" << range.get_end().get_line();
+        return os << "line " << range.get_start().get_line() << "-" << range.get_end().get_line()
+            << " byte " << range.get_start().get_byte() << "-" << range.get_end().get_byte()
+        ;
     }
     Range operator+(Range left, const Range &right) {
         return std::move(left += right);
