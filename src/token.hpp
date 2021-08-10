@@ -120,51 +120,73 @@ namespace token {
     public:
         Less(pos::Range &&);
         ~Less() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class LessEqual: public Token {
     public:
         LessEqual(pos::Range &&);
         ~LessEqual() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class DoubleLess: public Token {
     public:
         DoubleLess(pos::Range &&);
         ~DoubleLess() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
+    };
+    class TripleLess: public Token {
+    public:
+        TripleLess(pos::Range &&);
+        ~TripleLess() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Greater: public Token {
     public:
         Greater(pos::Range &&);
         ~Greater() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class GreaterEqual: public Token {
     public:
         GreaterEqual(pos::Range &&);
         ~GreaterEqual() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class DoubleGreater: public Token {
     public:
         DoubleGreater(pos::Range &&);
         ~DoubleGreater() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
+    };
+    class TripleGreater: public Token {
+    public:
+        TripleGreater(pos::Range &&);
+        ~TripleGreater() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Ampersand: public Token {
     public:
         Ampersand(pos::Range &&);
         ~Ampersand() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class DoubleAmpersand: public Token {
     public:
         DoubleAmpersand(pos::Range &&);
         ~DoubleAmpersand() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Bar: public Token {
     public:
         Bar(pos::Range &&);
         ~Bar() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class DoubleBar: public Token {
     public:
         DoubleBar(pos::Range &&);
         ~DoubleBar() override;
+        std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Colon: public Token {
     public:

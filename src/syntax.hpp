@@ -66,10 +66,24 @@ namespace syntax {
         Mul,
         Div,
         Rem,
-        Pow,
+        Less,
+        LessEqual,
+        Greater,
+        GreaterEqual,
         Equal,
-        NotEqual
+        NotEqual,
+        BitAnd,
+        BitOr,
+        Xor,
+        LogicalAnd,
+        LogicalOr,
+        LeftShift,
+        RightShift,
+        ForwardShift,
+        BackwardShift
     };
+    int precedence(BinaryOperator);
+    std::ostream &operator<<(std::ostream &, const BinaryOperator &);
     class Binary: public Expression {
         BinaryOperator op;
         std::unique_ptr<Expression> left, right;

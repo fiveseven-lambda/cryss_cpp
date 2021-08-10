@@ -67,6 +67,9 @@ namespace token {
     DoubleLess::DoubleLess(pos::Range &&range):
         Token(std::move(range)) {}
     DoubleLess::~DoubleLess() = default;
+    TripleLess::TripleLess(pos::Range &&range):
+        Token(std::move(range)) {}
+    TripleLess::~TripleLess() = default;
     Greater::Greater(pos::Range &&range):
         Token(std::move(range)) {}
     Greater::~Greater() = default;
@@ -76,6 +79,9 @@ namespace token {
     DoubleGreater::DoubleGreater(pos::Range &&range):
         Token(std::move(range)) {}
     DoubleGreater::~DoubleGreater() = default;
+    TripleGreater::TripleGreater(pos::Range &&range):
+        Token(std::move(range)) {}
+    TripleGreater::~TripleGreater() = default;
     Ampersand::Ampersand(pos::Range &&range):
         Token(std::move(range)) {}
     Ampersand::~Ampersand() = default;
@@ -168,13 +174,49 @@ namespace token {
         return syntax::BinaryOperator::Rem;
     }
     std::optional<syntax::BinaryOperator> Circumflex::binary_operator() {
-        return syntax::BinaryOperator::Pow;
+        return syntax::BinaryOperator::Xor;
     }
     std::optional<syntax::BinaryOperator> DoubleEqual::binary_operator() {
         return syntax::BinaryOperator::Equal;
     }
     std::optional<syntax::BinaryOperator> ExclamationEqual::binary_operator() {
         return syntax::BinaryOperator::NotEqual;
+    }
+    std::optional<syntax::BinaryOperator> Less::binary_operator() {
+        return syntax::BinaryOperator::Less;
+    }
+    std::optional<syntax::BinaryOperator> LessEqual::binary_operator() {
+        return syntax::BinaryOperator::LessEqual;
+    }
+    std::optional<syntax::BinaryOperator> DoubleLess::binary_operator() {
+        return syntax::BinaryOperator::LeftShift;
+    }
+    std::optional<syntax::BinaryOperator> TripleLess::binary_operator() {
+        return syntax::BinaryOperator::BackwardShift;
+    }
+    std::optional<syntax::BinaryOperator> Greater::binary_operator() {
+        return syntax::BinaryOperator::Greater;
+    }
+    std::optional<syntax::BinaryOperator> GreaterEqual::binary_operator() {
+        return syntax::BinaryOperator::GreaterEqual;
+    }
+    std::optional<syntax::BinaryOperator> DoubleGreater::binary_operator() {
+        return syntax::BinaryOperator::RightShift;
+    }
+    std::optional<syntax::BinaryOperator> TripleGreater::binary_operator() {
+        return syntax::BinaryOperator::ForwardShift;
+    }
+    std::optional<syntax::BinaryOperator> Ampersand::binary_operator() {
+        return syntax::BinaryOperator::BitAnd;
+    }
+    std::optional<syntax::BinaryOperator> DoubleAmpersand::binary_operator() {
+        return syntax::BinaryOperator::LogicalAnd;
+    }
+    std::optional<syntax::BinaryOperator> Bar::binary_operator() {
+        return syntax::BinaryOperator::BitOr;
+    }
+    std::optional<syntax::BinaryOperator> DoubleBar::binary_operator() {
+        return syntax::BinaryOperator::LogicalOr;
     }
     bool Token::question(){
         return false;

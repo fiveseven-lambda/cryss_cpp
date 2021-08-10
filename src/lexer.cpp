@@ -118,7 +118,13 @@ std::optional<std::unique_ptr<token::Token>> &Lexer::peek(std::string &log) {
                     peeked = std::make_unique<token::LessEqual>(pos::Range(start, input.peek().first));
                 }else if(c == '<'){
                     input.get(log);
-                    peeked = std::make_unique<token::DoubleLess>(pos::Range(start, input.peek().first));
+                    auto [pos2, c2] = input.peek();
+                    if(c == '<'){
+                        input.get(log);
+                        peeked = std::make_unique<token::TripleLess>(pos::Range(start, input.peek().first));
+                    }else{
+                        peeked = std::make_unique<token::DoubleLess>(pos::Range(start, pos2));
+                    }
                 }else{
                     peeked = std::make_unique<token::Less>(pos::Range(start, pos));
                 }
@@ -128,9 +134,15 @@ std::optional<std::unique_ptr<token::Token>> &Lexer::peek(std::string &log) {
                 if(c == '='){
                     input.get(log);
                     peeked = std::make_unique<token::GreaterEqual>(pos::Range(start, input.peek().first));
-                }else if(c == '<'){
+                }else if(c == '>'){
                     input.get(log);
-                    peeked = std::make_unique<token::DoubleGreater>(pos::Range(start, input.peek().first));
+                    auto [pos2, c2] = input.peek();
+                    if(c == '>'){
+                        input.get(log);
+                        peeked = std::make_unique<token::TripleGreater>(pos::Range(start, input.peek().first));
+                    }else{
+                        peeked = std::make_unique<token::DoubleGreater>(pos::Range(start, pos2));
+                    }
                 }else{
                     peeked = std::make_unique<token::Greater>(pos::Range(start, pos));
                 }
