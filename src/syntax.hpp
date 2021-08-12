@@ -99,6 +99,12 @@ namespace syntax {
         ~Group() override;
         void print(int) override;
     };
+
+    class Sentence {
+    };
+    class ExpressionSentence : public Sentence {
+        std::optional<Expression> expression;
+    };
 }
 
 #endif
