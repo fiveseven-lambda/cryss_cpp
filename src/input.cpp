@@ -17,8 +17,6 @@ std::pair<pos::Pos, int> Input::peek(){
 std::pair<pos::Pos, int> Input::get(std::string &log){
     int c = source.get();
     if(c != EOF){
-        // std::basic_istream::get() の仕様により EOF でないなら char の範囲に収まってる（はず？）
-        // std::char_traits<char>::to_char_type() が何やってるかはよく分からない
         log.push_back(std::char_traits<char>::to_char_type(c));
     }
     auto ret = std::make_pair(pos::Pos(line, byte), c);

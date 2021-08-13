@@ -10,7 +10,15 @@ namespace pos {
         return byte;
     }
     std::ostream &operator<<(std::ostream &os, const Pos &pos){
-        return os << "line " << pos.get_line();
+        return os << "line " << pos.get_line() + 1;
+    }
+    void Pos::display(const std::string &log, std::ostream &os){
+        auto left = log.rfind('\n', byte) + 1;
+        auto right = log.find('\n', byte) + 1;
+        os
+            << log.substr(left, byte - left)
+            << " !-> "
+            << log.substr(byte, right - byte);
     }
     Range::Range(Pos start, Pos end): start(start), end(end) {}
     Range::Range(Range &&) = default;
@@ -26,7 +34,7 @@ namespace pos {
         return end;
     }
     std::ostream &operator<<(std::ostream &os, const Range &range){
-        return os << "line " << range.get_start().get_line() << "-" << range.get_end().get_line()
+        return os << "line " << range.get_start().get_line() + 1 << "-" << range.get_end().get_line() + 1
             << " byte " << range.get_start().get_byte() << "-" << range.get_end().get_byte()
         ;
     }
@@ -34,6 +42,18 @@ namespace pos {
         return std::move(left += right);
     }
     std::string Range::substr(const std::string &log){
-        return log.substr(start.get_byte(), end.get_byte());
+        return log.substr(start.get_byte(), end.get_byte() - start.get_byte());
+    }
+    void Range::display(const std::string &log, std::ostream &os){
+        auto start_byte = start.get_byte();
+        auto end_byte = start.get_byte();
+        auto left = log.rfind('\n', start_byte) + 1;
+        auto right = log.find('\n', end_byte) + 1;
+        os
+            << log.substr(left, start_byte - left)
+            << " !-> "
+            << log.substr(start_byte, end_byte - start_byte)
+            << " <-! "
+            << log.substr(end_byte, right - end_byte);
     }
 }

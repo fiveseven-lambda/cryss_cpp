@@ -10,26 +10,29 @@ namespace error {
         void virtual print(const std::string &) = 0;
         virtual ~Error();
     };
-    class UnexpectedCharacter: public Error {
+    class UnexpectedCharacter : public Error {
         pos::Range range;
     public:
         UnexpectedCharacter(pos::Range &&);
         void print(const std::string &) override;
-        ~UnexpectedCharacter() override;
     };
-    class UnexpectedToken: public Error {
+    class UnterminatedComment : public Error {
+        pos::Pos pos;
+    public:
+        UnterminatedComment(pos::Pos &&);
+        void print(const std::string &) override;
+    };
+    class UnterminatedStringLiteral : public Error {
+        pos::Pos pos;
+    public:
+        UnterminatedStringLiteral(pos::Pos &&);
+        void print(const std::string &) override;
+    };
+    class UnexpectedToken : public Error {
         pos::Range range;
     public:
         UnexpectedToken(pos::Range &&);
         void print(const std::string &) override;
-        ~UnexpectedToken() override;
-    };
-    class EmptyExpressionAfterUnaryOperator: public Error {
-        pos::Range range;
-    public:
-        EmptyExpressionAfterUnaryOperator(pos::Range &&);
-        void print(const std::string &) override;
-        ~EmptyExpressionAfterUnaryOperator() override;
     };
 }
 #endif

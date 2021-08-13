@@ -1,250 +1,70 @@
-#ifndef TOKEN_H
-#define TOKEN_H
+#ifndef TOKEN_HPP
+#define TOKEN_HPP
 
-#include <optional>
-#include <memory>
-#include "pos.hpp"
-#include "syntax.hpp"
+#include <string>
 
 namespace token {
     class Token {
-        pos::Range range;
-    protected:
-        Token(pos::Range &&);
-    public:
-        virtual ~Token();
-        pos::Range get_range();
         Token(const Token &) = delete;
         Token &operator=(const Token &) = delete;
-        virtual std::optional<std::unique_ptr<syntax::Expression>> factor();
-        virtual std::optional<syntax::UnaryOperator> unary_operator();
-        virtual std::optional<syntax::BinaryOperator> binary_operator();
-        virtual bool question(), opening_parenthesis();
+    protected:
+        Token();
+    public:
+        virtual ~Token();
     };
-
-    class Identifier: public Token {
+    class Identifier : public Token {
         std::string name;
     public:
-        Identifier(pos::Range &&, std::string &&);
-        ~Identifier() override;
-        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
+        Identifier(std::string &&);
     };
-
-    class Integer: public Token {
+    class Integer : public Token {
         std::int32_t value;
     public:
-        Integer(pos::Range &&, std::int32_t);
-        ~Integer() override;
-        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
+        Integer(std::int32_t);
     };
-
-    class Real: public Token {
+    class Real : public Token {
         double value;
     public:
-        Real(pos::Range &&, double);
-        ~Real() override;
-        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
+        Real(double);
     };
-
-    class String: public Token {
+    class String : public Token {
         std::string value;
     public:
-        String(pos::Range &&, std::string &&);
-        ~String() override;
-        std::optional<std::unique_ptr<syntax::Expression>> factor() override;
+        String(std::string &&);
     };
-
-
-    class Plus: public Token {
-    public:
-        Plus(pos::Range &&);
-        ~Plus() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Hyphen: public Token {
-    public:
-        Hyphen(pos::Range &&);
-        ~Hyphen() override;
-        std::optional<syntax::UnaryOperator> unary_operator() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Asterisk: public Token {
-    public:
-        Asterisk(pos::Range &&);
-        ~Asterisk() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Slash: public Token {
-    public:
-        Slash(pos::Range &&);
-        ~Slash() override;
-        std::optional<syntax::UnaryOperator> unary_operator() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Percent: public Token {
-    public:
-        Percent(pos::Range &&);
-        ~Percent() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Circumflex: public Token {
-    public:
-        Circumflex(pos::Range &&);
-        ~Circumflex() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Equal: public Token {
-    public:
-        Equal(pos::Range &&);
-        ~Equal() override;
-    };
-    class DoubleEqual: public Token {
-    public:
-        DoubleEqual(pos::Range &&);
-        ~DoubleEqual() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Exclamation: public Token {
-    public:
-        Exclamation(pos::Range &&);
-        ~Exclamation() override;
-        std::optional<syntax::UnaryOperator> unary_operator() override;
-    };
-    class ExclamationEqual: public Token {
-    public:
-        ExclamationEqual(pos::Range &&);
-        ~ExclamationEqual() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Less: public Token {
-    public:
-        Less(pos::Range &&);
-        ~Less() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class LessEqual: public Token {
-    public:
-        LessEqual(pos::Range &&);
-        ~LessEqual() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class DoubleLess: public Token {
-    public:
-        DoubleLess(pos::Range &&);
-        ~DoubleLess() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class TripleLess: public Token {
-    public:
-        TripleLess(pos::Range &&);
-        ~TripleLess() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Greater: public Token {
-    public:
-        Greater(pos::Range &&);
-        ~Greater() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class GreaterEqual: public Token {
-    public:
-        GreaterEqual(pos::Range &&);
-        ~GreaterEqual() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class DoubleGreater: public Token {
-    public:
-        DoubleGreater(pos::Range &&);
-        ~DoubleGreater() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class TripleGreater: public Token {
-    public:
-        TripleGreater(pos::Range &&);
-        ~TripleGreater() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Ampersand: public Token {
-    public:
-        Ampersand(pos::Range &&);
-        ~Ampersand() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class DoubleAmpersand: public Token {
-    public:
-        DoubleAmpersand(pos::Range &&);
-        ~DoubleAmpersand() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Bar: public Token {
-    public:
-        Bar(pos::Range &&);
-        ~Bar() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class DoubleBar: public Token {
-    public:
-        DoubleBar(pos::Range &&);
-        ~DoubleBar() override;
-        std::optional<syntax::BinaryOperator> binary_operator() override;
-    };
-    class Colon: public Token {
-    public:
-        Colon(pos::Range &&);
-        ~Colon() override;
-    };
-    class Semicolon: public Token {
-    public:
-        Semicolon(pos::Range &&);
-        ~Semicolon() override;
-    };
-    class Comma: public Token {
-    public:
-        Comma(pos::Range &&);
-        ~Comma() override;
-    };
-    class Dot: public Token {
-    public:
-        Dot(pos::Range &&);
-        ~Dot() override;
-    };
-    class Question: public Token {
-    public:
-        Question(pos::Range &&);
-        ~Question() override;
-        bool question() override;
-    };
-    class OpeningParenthesis: public Token {
-    public:
-        OpeningParenthesis(pos::Range &&);
-        ~OpeningParenthesis() override;
-        bool opening_parenthesis() override;
-    };
-    class ClosingParenthesis: public Token {
-    public:
-        ClosingParenthesis(pos::Range &&);
-        ~ClosingParenthesis() override;
-    };
-    class OpeningBracket: public Token {
-    public:
-        OpeningBracket(pos::Range &&);
-        ~OpeningBracket() override;
-    };
-    class ClosingBracket: public Token {
-    public:
-        ClosingBracket(pos::Range &&);
-        ~ClosingBracket() override;
-    };
-    class OpeningBrace: public Token {
-    public:
-        OpeningBrace(pos::Range &&);
-        ~OpeningBrace() override;
-    };
-    class ClosingBrace: public Token {
-    public:
-        ClosingBrace(pos::Range &&);
-        ~ClosingBrace() override;
-    };
+    class Plus : public Token {};
+    class Hyphen : public Token {};
+    class Asterisk : public Token {};
+    class Slash : public Token {};
+    class Percent : public Token {};
+    class Circumflex : public Token {};
+    class Equal : public Token {};
+    class DoubleEqual : public Token {};
+    class Exclamation : public Token {};
+    class ExclamationEqual : public Token {};
+    class Less : public Token {};
+    class LessEqual : public Token {};
+    class DoubleLess : public Token {};
+    class TripleLess : public Token {};
+    class Greater : public Token {};
+    class GreaterEqual : public Token {};
+    class DoubleGreater: public Token {};
+    class TripleGreater : public Token {};
+    class Ampersand : public Token {};
+    class DoubleAmpersand : public Token {};
+    class Bar : public Token {};
+    class DoubleBar : public Token {};
+    class Colon : public Token {};
+    class Semicolon : public Token {};
+    class Comma : public Token {};
+    class Dot : public Token {};
+    class Question : public Token {};
+    class OpeningParenthesis : public Token {};
+    class ClosingParenthesis : public Token {};
+    class OpeningBracket : public Token {};
+    class ClosingBracket : public Token {};
+    class OpeningBrace : public Token {};
+    class ClosingBrace : public Token {};
 }
 
 #endif

@@ -1,16 +1,14 @@
 #include "pos.hpp"
 #include "error.hpp"
+#include "token.hpp"
 #include "lexer.hpp"
-#include "parser.hpp"
 
 int main(){
     Lexer lexer;
     std::string log;
-    try {
-        while(auto optional = parse_expression(lexer, log)) {
-            optional.value()->print();
-        }
-    } catch(std::unique_ptr<error::Error> &err) {
+    try{
+        while(lexer.next(log).second);
+    }catch(std::unique_ptr<error::Error> &err){
         err->print(log);
     }
 }

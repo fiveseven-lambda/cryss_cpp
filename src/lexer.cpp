@@ -1,221 +1,171 @@
-#include <memory>
-#include <cctype>
 #include <vector>
-#include "pos.hpp"
 #include "error.hpp"
-#include "token.hpp"
 #include "lexer.hpp"
 
-Lexer::Lexer(): input(std::cin, true) {}
+Lexer::Lexer():
+    input(std::cin, true) {}
+Lexer::Lexer(std::ifstream &file):
+    input(file, false) {}
 
-Lexer::Lexer(std::ifstream &file): input(file, false) {}
+std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &log){
+    if(!peeked){
+        std::unique_ptr<token::Token> token;
+        while(std::isspace(input.peek().second)) input.get(log);
+        auto [start, first] = input.get(log);
+        if(first == EOF){
+            token = nullptr;
+        }else if(std::isalpha(first)){
+            std::string name(1, std::char_traits<char>::to_char_type(first));
+            while(std::isalnum(input.peek().second))
+                name.push_back(std::char_traits<char>::to_char_type(input.get(log).second));
+            token = std::make_unique<token::Identifier>(std::move(name));
+        }else if('"'){
+            std::string name;
+            int c;
+            while((c = input.get(log).second) != '"'){
+                if(c == EOF){
+                    throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnterminatedStringLiteral>(std::move(start)));
+                }else if(c == '\\'){
+                    c = input.get(log).second;
+                    switch(c){
+                        case 'n': c = '\n'; break;
+                        case 'r': c = '\r'; break;
+                        case 't': c = '\t'; break;
+                        case '0': c = '\0'; break;
+                    }
+                }
+                name.push_back(std::char_traits<char>::to_char_type(c));
+            }
+            token = std::make_unique<token::String>(std::move(name));
+        }else if(first == '+'){
+            token = std::make_unique<token::Plus>();
+        }else if(first == '-'){
+            token = std::make_unique<token::Hyphen>();
+        }else if(first == '*'){
+            token = std::make_unique<token::Asterisk>();
+        }else if(first == '/'){
+            auto c = input.peek().second;
+            if(c == '*'){
+                // コメントの開始 `/*` の `*` を peek 中
+                input.get(log); // `*` を get
+                std::vector<pos::Pos> comment(1, start); // コメント開始位置： `/`
+                while(!comment.empty()){
+                    auto [pos, c] = input.get(log);
+                    if(c == EOF){
+                        throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnterminatedComment>(std::move(comment.back())));
+                    }else if(c == '*'){
+                        if(input.peek().second == '/'){
+                            input.get(log);
+                            comment.pop_back();
+                        }
+                    }else if(c == '/'){
+                        if(input.peek().second == '*'){
+                            input.get(log);
+                            comment.push_back(pos);
+                        }
+                    }
+                }
+                return peek(log);
+            }else if(c == '/'){
+                input.get(log);
+                while(input.get(log).second != '\n');
+                return peek(log);
+            }else{
+                token = std::make_unique<token::Slash>();
+            }
+        }else if(first == '%'){
+            token = std::make_unique<token::Asterisk>();
+        }else if(first == '^'){
+            token = std::make_unique<token::Circumflex>();
+        }else if(first == '='){
+            if(input.peek().second == '='){
+                input.get(log);
+                token = std::make_unique<token::DoubleEqual>();
+            }else{
+                token = std::make_unique<token::Equal>();
+            }
+        }else if(first == '!'){
+            if(input.peek().second == '='){
+                input.get(log);
+                token = std::make_unique<token::ExclamationEqual>();
+            }else{
+                token = std::make_unique<token::Exclamation>();
+            }
+        }else if(first == '<'){
+            auto c = input.peek().second;
+            if(c == '='){
+                input.get(log);
+                token = std::make_unique<token::LessEqual>();
+            }else if(c == '<'){
+                input.get(log); // 2 文字目 get
+                if(input.peek().second == '<'){
+                    input.get(log); // 3 文字目 get
+                    token = std::make_unique<token::TripleLess>();
+                }else{
+                    token = std::make_unique<token::DoubleLess>();
+                }
+            }else{
+                token = std::make_unique<token::Less>();
+            }
+        }else if(first == '>'){
+            auto c = input.peek().second;
+            if(c == '='){
+                input.get(log);
+                token = std::make_unique<token::GreaterEqual>();
+            }else if(c == '>'){
+                input.get(log); // 2 文字目 get
+                if(input.peek().second == '>'){
+                    input.get(log); // 3 文字目 get
+                    token = std::make_unique<token::TripleGreater>();
+                }else{
+                    token = std::make_unique<token::DoubleGreater>();
+                }
+            }else{
+                token = std::make_unique<token::Greater>();
+            }
+        }else if(first == '&'){
+            if(input.peek().second == '&'){
+                input.get(log);
+                token = std::make_unique<token::DoubleAmpersand>();
+            }else{
+                token = std::make_unique<token::Ampersand>();
+            }
+        }else if(first == '|'){
+            if(input.peek().second == '|'){
+                input.get(log);
+                token = std::make_unique<token::DoubleBar>();
+            }else{
+                token = std::make_unique<token::Bar>();
+            }
+        }else if(first == ':'){
+            token = std::make_unique<token::Colon>();
+        }else if(first == ';'){
+            token = std::make_unique<token::Semicolon>();
+        }else if(first == ','){
+            token = std::make_unique<token::Comma>();
+        }else if(first == '?'){
+            token = std::make_unique<token::Question>();
+        }else if(first == '('){
+            token = std::make_unique<token::OpeningParenthesis>();
+        }else if(first == ')'){
+            token = std::make_unique<token::ClosingParenthesis>();
+        }else if(first == '['){
+            token = std::make_unique<token::OpeningBracket>();
+        }else if(first == ']'){
+            token = std::make_unique<token::ClosingBracket>();
+        }else if(first == '{'){
+            token = std::make_unique<token::OpeningBrace>();
+        }else if(first == '}'){
+            token = std::make_unique<token::ClosingBrace>();
+        }
+        peeked = std::make_pair(pos::Range(start, input.peek().first), std::move(token));
+    }
+    return peeked.value();
+}
 
-std::optional<std::unique_ptr<token::Token>> Lexer::next(std::string &log) {
-    // とりあえず peek() すると peeked は true になる
+std::pair<pos::Range, std::unique_ptr<token::Token>> Lexer::next(std::string &log) {
     peek(log);
     auto ret = std::move(peeked).value();
     peeked = std::nullopt;
     return ret;
-}
-std::optional<std::unique_ptr<token::Token>> &Lexer::peek(std::string &log) {
-    if(!peeked){
-        while(std::isspace(input.peek().second)) input.get(log);
-        auto [start, first] = input.get(log);
-        if(first == EOF){
-            peeked = std::make_optional<std::optional<std::unique_ptr<token::Token>>>();
-        }else if(std::isalpha(first)){
-            std::string ret(1, std::char_traits<char>::to_char_type(first));
-            while(std::isalnum(input.peek().second)) ret.push_back(std::char_traits<char>::to_char_type(input.get(log).second));
-            auto end = input.peek().first;
-            peeked = std::make_unique<token::Identifier>(pos::Range(start, end), std::move(ret));
-        }else{
-            int ivalue;
-            if('0' <= first && first <= '9'){
-                ivalue = first - '0';
-                while(true){
-                    auto [pos, c] = input.peek();
-                    if('0' <= c && c <= '9'){
-                        input.get(log);
-                        ivalue = ivalue * 10 + (c - '0');
-                    }else if(c == '.'){
-                        input.get(log);
-                        break;
-                    }else{
-                        peeked = std::make_unique<token::Integer>(pos::Range(start, pos), ivalue);
-                        goto end;
-                    }
-                }
-            }else if(first == '.'){
-                auto [pos, c] = input.peek();
-                if('0' <= c && c <= '9'){
-                    ivalue = 0;
-                }else{
-                    peeked = std::make_unique<token::Dot>(pos::Range(start, pos));
-                    goto end;
-                }
-            }else if(first == '+'){
-                peeked = std::make_unique<token::Plus>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '-'){
-                peeked = std::make_unique<token::Hyphen>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '*'){
-                peeked = std::make_unique<token::Asterisk>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '/'){
-                auto [pos, c] = input.peek();
-                if(c == '*'){
-                    std::vector<pos::Pos> comment(1, start);
-                    while(!comment.empty()){
-                        auto [pos, c] = input.get(log);
-                        if(c == '*'){
-                            if(input.peek().second == '/'){
-                                input.get(log);
-                                comment.pop_back();
-                            }
-                        }else if(c == '/'){
-                            if(input.peek().second == '*'){
-                                input.get(log);
-                                comment.push_back(pos);
-                            }
-                        }
-                    }
-                }else if(c == '/'){
-                    while(input.get(log).second != '\n');
-                }else{
-                    peeked = std::make_unique<token::Slash>(pos::Range(start, input.peek().first));
-                    goto end;
-                }
-                return peek(log);
-            }else if(first == '%'){
-                peeked = std::make_unique<token::Percent>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '^'){
-                peeked = std::make_unique<token::Circumflex>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '='){
-                auto [pos, c] = input.peek();
-                if(c == '='){
-                    input.get(log);
-                    peeked = std::make_unique<token::DoubleEqual>(pos::Range(start, input.peek().first));
-                }else{
-                    peeked = std::make_unique<token::Equal>(pos::Range(start, pos));
-                }
-                goto end;
-            }else if(first == '!'){
-                auto [pos, c] = input.peek();
-                if(c == '='){
-                    input.get(log);
-                    peeked = std::make_unique<token::ExclamationEqual>(pos::Range(start, input.peek().first));
-                }else{
-                    peeked = std::make_unique<token::Exclamation>(pos::Range(start, pos));
-                }
-                goto end;
-            }else if(first == '<'){
-                auto [pos, c] = input.peek();
-                if(c == '='){
-                    input.get(log);
-                    peeked = std::make_unique<token::LessEqual>(pos::Range(start, input.peek().first));
-                }else if(c == '<'){
-                    input.get(log);
-                    auto [pos2, c2] = input.peek();
-                    if(c == '<'){
-                        input.get(log);
-                        peeked = std::make_unique<token::TripleLess>(pos::Range(start, input.peek().first));
-                    }else{
-                        peeked = std::make_unique<token::DoubleLess>(pos::Range(start, pos2));
-                    }
-                }else{
-                    peeked = std::make_unique<token::Less>(pos::Range(start, pos));
-                }
-                goto end;
-            }else if(first == '>'){
-                auto [pos, c] = input.peek();
-                if(c == '='){
-                    input.get(log);
-                    peeked = std::make_unique<token::GreaterEqual>(pos::Range(start, input.peek().first));
-                }else if(c == '>'){
-                    input.get(log);
-                    auto [pos2, c2] = input.peek();
-                    if(c == '>'){
-                        input.get(log);
-                        peeked = std::make_unique<token::TripleGreater>(pos::Range(start, input.peek().first));
-                    }else{
-                        peeked = std::make_unique<token::DoubleGreater>(pos::Range(start, pos2));
-                    }
-                }else{
-                    peeked = std::make_unique<token::Greater>(pos::Range(start, pos));
-                }
-                goto end;
-            }else if(first == '&'){
-                auto [pos, c] = input.peek();
-                if(c == '&'){
-                    input.get(log);
-                    peeked = std::make_unique<token::DoubleAmpersand>(pos::Range(start, input.peek().first));
-                }else{
-                    peeked = std::make_unique<token::Ampersand>(pos::Range(start, pos));
-                }
-                goto end;
-            }else if(first == '|'){
-                auto [pos, c] = input.peek();
-                if(c == '|'){
-                    input.get(log);
-                    peeked = std::make_unique<token::DoubleBar>(pos::Range(start, input.peek().first));
-                }else{
-                    peeked = std::make_unique<token::Bar>(pos::Range(start, pos));
-                }
-                goto end;
-            }else if(first == ':'){
-                peeked = std::make_unique<token::Colon>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == ';'){
-                peeked = std::make_unique<token::Semicolon>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == ','){
-                peeked = std::make_unique<token::Comma>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '?'){
-                peeked = std::make_unique<token::Question>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '('){
-                peeked = std::make_unique<token::OpeningParenthesis>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == ')'){
-                peeked = std::make_unique<token::ClosingParenthesis>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '['){
-                peeked = std::make_unique<token::OpeningBracket>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == ']'){
-                peeked = std::make_unique<token::ClosingBracket>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '{'){
-                peeked = std::make_unique<token::OpeningBrace>(pos::Range(start, input.peek().first));
-                goto end;
-            }else if(first == '}'){
-                peeked = std::make_unique<token::ClosingBrace>(pos::Range(start, input.peek().first));
-                goto end;
-            }else{
-                if(first >= 0xF0) input.get(log);
-                if(first >= 0xE0) input.get(log);
-                if(first >= 0xC0) input.get(log);
-                auto end = input.peek().first;
-                throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedCharacter>(pos::Range(start, end)));
-            }
-            double dvalue = ivalue;
-            double tmp = 1;
-            while(true){
-                auto [pos, c] = input.peek();
-                if('0' <= c && c <= '9'){
-                    dvalue += (tmp *= .1) * (c - '0');
-                }else{
-                    peeked = std::make_unique<token::Real>(pos::Range(start, pos), dvalue);
-                    goto end;
-                }
-                input.get(log);
-            }
-        }
-    }
-end:    
-    return peeked.value();
 }
