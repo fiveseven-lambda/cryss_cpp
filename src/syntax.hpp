@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
+#include <optional>
 
 #include "pos.hpp"
 
@@ -18,6 +19,7 @@ namespace syntax {
         virtual ~Expression();
         // FOR DEBUG
         virtual void print(int = 0) = 0;
+        virtual std::optional<std::string> identifier();
     };
 
     using PairRangeExpression = std::pair<pos::Range, std::unique_ptr<Expression>>;
@@ -28,6 +30,7 @@ namespace syntax {
     public:
         Identifier(std::string &&);
         void print(int) override;
+        std::optional<std::string> identifier() override;
     };
 
     // 整数リテラル

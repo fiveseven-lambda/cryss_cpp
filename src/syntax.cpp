@@ -51,6 +51,10 @@ namespace syntax {
         std::terminate();
     }
 
+    std::optional<std::string> Expression::identifier(){ return std::nullopt; }
+    std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+
+    // for debug
     constexpr int TAB = 4;
     void Identifier::print(int indent){
         std::cout << std::setw(indent) << "";
