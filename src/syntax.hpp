@@ -3,6 +3,8 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
+#include <unordered_map>
 
 #include "pos.hpp"
 
@@ -17,6 +19,8 @@ namespace syntax {
         // FOR DEBUG
         virtual void print(int = 0) = 0;
     };
+
+    using PairRangeExpression = std::pair<pos::Range, std::unique_ptr<Expression>>;
 
     // 識別子
     class Identifier : public Expression {
@@ -59,9 +63,9 @@ namespace syntax {
     std::ostream &operator<<(std::ostream &, const UnaryOperator &); // for debug print
     class Unary : public Expression {
         UnaryOperator unary_operator;
-        std::pair<pos::Range, std::unique_ptr<Expression>> operand;
+        PairRangeExpression operand;
     public:
-        Unary(UnaryOperator, std::pair<pos::Range, std::unique_ptr<Expression>>);
+        Unary(UnaryOperator, PairRangeExpression);
         void print(int) override;
     };
 
@@ -80,17 +84,25 @@ namespace syntax {
     int precedence(BinaryOperator);
     class Binary : public Expression {
         BinaryOperator binary_operator;
-        std::pair<pos::Range, std::unique_ptr<Expression>> left, right;
+        PairRangeExpression left, right;
     public:
-        Binary(BinaryOperator, std::pair<pos::Range, std::unique_ptr<Expression>>, std::pair<pos::Range, std::unique_ptr<Expression>>);
+        Binary(BinaryOperator, PairRangeExpression, PairRangeExpression);
         void print(int) override;
     };
 
     // 括弧でくくった部分
     class Group : public Expression {
-        std::pair<pos::Range, std::unique_ptr<Expression>> expression;
+        PairRangeExpression expression;
     public:
-        Group(std::pair<pos::Range, std::unique_ptr<Expression>>);
+        Group(PairRangeExpression);
+        void print(int) override;
+    };
+
+    class Invocation : public Expression {
+        PairRangeExpression function;
+        std::vector<PairRangeExpression> arguments;
+        std::unordered_map<std::string, PairRangeExpression> named_arguments;
+    public:
         void print(int) override;
     };
 }

@@ -11,21 +11,14 @@ namespace syntax {
         value(value) {}
     String::String(std::string &&value):
         value(value) {}
-    Unary::Unary(
-        UnaryOperator unary_operator,
-        std::pair<pos::Range, std::unique_ptr<Expression>> operand
-    ):
+    Unary::Unary(UnaryOperator unary_operator, PairRangeExpression operand):
         unary_operator(unary_operator),
         operand(std::move(operand)) {}
-    Binary::Binary(
-        BinaryOperator binary_operator,
-        std::pair<pos::Range, std::unique_ptr<Expression>> left,
-        std::pair<pos::Range, std::unique_ptr<Expression>> right
-    ):
+    Binary::Binary(BinaryOperator binary_operator, PairRangeExpression left, PairRangeExpression right):
         binary_operator(binary_operator),
         left(std::move(left)),
         right(std::move(right)) {}
-    Group::Group(std::pair<pos::Range, std::unique_ptr<Expression>> expression):
+    Group::Group(PairRangeExpression expression):
         expression(std::move(expression)) {}
 
     int precedence(BinaryOperator op){

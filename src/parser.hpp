@@ -8,6 +8,6 @@
 #include "lexer.hpp"
 #include "syntax.hpp"
 
-std::pair<pos::Range, std::unique_ptr<syntax::Expression>> parse_expression(Lexer &, std::string &);
+syntax::PairRangeExpression parse_expression(Lexer &, std::string &);
 
 #endif

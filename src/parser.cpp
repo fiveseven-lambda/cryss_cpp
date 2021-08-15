@@ -1,8 +1,8 @@
 #include "error.hpp"
 #include "parser.hpp"
 
-static std::pair<pos::Range, std::unique_ptr<syntax::Expression>> parse_factor(Lexer &lexer, std::string &log){
-    std::pair<pos::Range, std::unique_ptr<syntax::Expression>> ret;
+static syntax::PairRangeExpression parse_factor(Lexer &lexer, std::string &log){
+    syntax::PairRangeExpression ret;
     while(true){
         auto &token_ref = lexer.peek(log).second;
         if(token_ref){
@@ -44,7 +44,7 @@ static std::pair<pos::Range, std::unique_ptr<syntax::Expression>> parse_factor(L
     }
 }
 
-static std::pair<pos::Range, std::unique_ptr<syntax::Expression>> parse_binary_operator(Lexer &lexer, std::string &log, int precedence){
+static syntax::PairRangeExpression parse_binary_operator(Lexer &lexer, std::string &log, int precedence){
     if(precedence == 11) return parse_factor(lexer, log);
     auto left = parse_binary_operator(lexer, log, precedence + 1);
     if(!left.second) throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedToken>(lexer.next(log).first));
@@ -64,6 +64,6 @@ static std::pair<pos::Range, std::unique_ptr<syntax::Expression>> parse_binary_o
     }
 }
 
-std::pair<pos::Range, std::unique_ptr<syntax::Expression>> parse_expression(Lexer &lexer, std::string &log){
+syntax::PairRangeExpression parse_expression(Lexer &lexer, std::string &log){
     return parse_binary_operator(lexer, log, 0);
 }
