@@ -1,1 +1,125 @@
 #include "syntax.hpp"
+
+namespace syntax {
+    Expression::~Expression() = default;
+
+    Identifier::Identifier(std::string &&name):
+        name(std::move(name)) {}
+    Integer::Integer(std::int32_t value):
+        value(value) {}
+    Real::Real(double value):
+        value(value) {}
+    String::String(std::string &&value):
+        value(value) {}
+    Unary::Unary(
+        UnaryOperator unary_operator,
+        std::pair<pos::Range, std::unique_ptr<Expression>> operand
+    ):
+        unary_operator(unary_operator),
+        operand(std::move(operand)) {}
+    Binary::Binary(
+        BinaryOperator binary_operator,
+        std::pair<pos::Range, std::unique_ptr<Expression>> left,
+        std::pair<pos::Range, std::unique_ptr<Expression>> right
+    ):
+        binary_operator(binary_operator),
+        left(std::move(left)),
+        right(std::move(right)) {}
+    Group::Group(std::pair<pos::Range, std::unique_ptr<Expression>> expression):
+        expression(std::move(expression)) {}
+
+    int precedence(BinaryOperator op){
+        switch(op){
+            case BinaryOperator::ForwardShift:
+            case BinaryOperator::BackwardShift: return 10;
+            case BinaryOperator::Mul:
+            case BinaryOperator::Div:
+            case BinaryOperator::Rem: return 9;
+            case BinaryOperator::Add:
+            case BinaryOperator::Sub: return 8;
+            case BinaryOperator::LeftShift:
+            case BinaryOperator::RightShift: return 7;
+            case BinaryOperator::BitAnd: return 6;
+            case BinaryOperator::BitOr: return 5;
+            case BinaryOperator::Xor: return 4;
+            case BinaryOperator::Less:
+            case BinaryOperator::LessEqual:
+            case BinaryOperator::Greater:
+            case BinaryOperator::GreaterEqual: return 3;
+            case BinaryOperator::Equal:
+            case BinaryOperator::NotEqual: return 2;
+            case BinaryOperator::LogicalAnd: return 1;
+            case BinaryOperator::LogicalOr: return 0;
+        }
+        std::terminate();
+    }
+
+    constexpr int TAB = 4;
+    void Identifier::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Identifier(" << name << ")" << std::endl;
+    }
+    void Integer::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Integer(" << value << ")" << std::endl;
+    }
+    void Real::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Real(" << value << ")" << std::endl;
+    }
+    void String::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "String(" << value << ")" << std::endl;
+    }
+    std::ostream &operator<<(std::ostream &os, const UnaryOperator &op){
+        switch(op){
+            case UnaryOperator::Minus: return os << "-";
+            case UnaryOperator::Reciprocal: return os << "/";
+            case UnaryOperator::Not: return os << "!";
+            case UnaryOperator::Print: return os << "?";
+        }
+        std::terminate();
+    }
+    void Unary::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Unary" << unary_operator << std::endl;
+        operand.second->print(indent + TAB);
+    }
+    void Group::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Group" << std::endl;
+        expression.second->print(indent + TAB);
+    }
+    std::ostream &operator<<(std::ostream &os, const BinaryOperator &op){
+        switch(op){
+            case BinaryOperator::Add: return os << "+";
+            case BinaryOperator::Sub: return os << "-";
+            case BinaryOperator::Mul: return os << "*";
+            case BinaryOperator::Div: return os << "/";
+            case BinaryOperator::Rem: return os << "%";
+            case BinaryOperator::Less: return os << "<";
+            case BinaryOperator::LessEqual: return os << "<=";
+            case BinaryOperator::Greater: return os << ">";
+            case BinaryOperator::GreaterEqual: return os << ">=";
+            case BinaryOperator::Equal: return os << "==";
+            case BinaryOperator::NotEqual: return os << "!=";
+            case BinaryOperator::BitAnd: return os << "&";
+            case BinaryOperator::BitOr: return os << "|";
+            case BinaryOperator::Xor: return os << "^";
+            case BinaryOperator::LogicalAnd: return os << "&&";
+            case BinaryOperator::LogicalOr: return os << "||";
+            case BinaryOperator::LeftShift: return os << "<<";
+            case BinaryOperator::RightShift: return os << ">>";
+            case BinaryOperator::ForwardShift: return os << ">>>";
+            case BinaryOperator::BackwardShift: return os << "<<<";
+        }
+        std::terminate();
+    }
+    void Binary::print(int indent){
+        left.second->print(indent + TAB);
+        std::cout << std::setw(indent) << "";
+        std::cout << "Binary" << binary_operator << std::endl;
+        right.second->print(indent + TAB);
+    }
+
+}

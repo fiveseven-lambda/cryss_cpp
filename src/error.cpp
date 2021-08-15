@@ -9,6 +9,7 @@ namespace error {
         range(std::move(range)) {}
     void UnexpectedCharacter::print(const std::string &log){
         std::cerr << "unexpected character `" << range.substr(log) << "` at " << range << std::endl;
+        range.display(log);
     }
 
     UnterminatedComment::UnterminatedComment(pos::Pos &&pos):
@@ -29,6 +30,7 @@ namespace error {
         range(std::move(range)) {}
     void UnexpectedToken::print(const std::string &log){
         std::cerr << "unexpected token `" << range.substr(log) << "` at " << range << std::endl;
+        range.display(log);
     }
 
 }

@@ -2,6 +2,7 @@
 #include "pos.hpp"
 
 namespace pos {
+    Pos::Pos() = default;
     Pos::Pos(std::size_t line, std::size_t byte): line(line), byte(byte) {}
     std::size_t Pos::get_line() const {
         return line;
@@ -20,11 +21,16 @@ namespace pos {
             << " !-> "
             << log.substr(byte, right - byte);
     }
+    Range::Range() = default;
     Range::Range(Pos start, Pos end): start(start), end(end) {}
     Range::Range(Range &&) = default;
     Range &Range::operator=(Range &&) = default;
     Range &Range::operator+=(const Range &other) {
         end = other.end;
+        return *this;
+    }
+    Range &Range::operator-=(const Range &other) {
+        start = other.start;
         return *this;
     }
     Pos Range::get_start() const {
@@ -41,12 +47,18 @@ namespace pos {
     Range operator+(Range left, const Range &right) {
         return std::move(left += right);
     }
+    Range operator-(Range left, const Range &right) {
+        return std::move(left -= right);
+    }
+    Range add_range(const Range &left, const Range &right){
+        return Range(left.get_start(), right.get_end());
+    }
     std::string Range::substr(const std::string &log){
         return log.substr(start.get_byte(), end.get_byte() - start.get_byte());
     }
     void Range::display(const std::string &log, std::ostream &os){
         auto start_byte = start.get_byte();
-        auto end_byte = start.get_byte();
+        auto end_byte = end.get_byte();
         auto left = log.rfind('\n', start_byte) + 1;
         auto right = log.find('\n', end_byte) + 1;
         os

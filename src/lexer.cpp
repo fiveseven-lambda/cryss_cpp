@@ -19,7 +19,7 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             while(std::isalnum(input.peek().second))
                 name.push_back(std::char_traits<char>::to_char_type(input.get(log).second));
             token = std::make_unique<token::Identifier>(std::move(name));
-        }else if('"'){
+        }else if(first == '"'){
             std::string name;
             int c;
             while((c = input.get(log).second) != '"'){
