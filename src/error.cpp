@@ -26,6 +26,13 @@ namespace error {
         pos.display(log);
     }
 
+    IncompleteScientificNotation::IncompleteScientificNotation(pos::Range &&range):
+        range(std::move(range)) {}
+    void IncompleteScientificNotation::print(const std::string &log){
+        std::cerr << "incomplete scientific notation `" << range.substr(log) << "` at" << range << std::endl;
+        range.display(log);
+    }
+
     UnexpectedToken::UnexpectedToken(pos::Range &&range):
         range(std::move(range)) {}
     void UnexpectedToken::print(const std::string &log){

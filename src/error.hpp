@@ -35,6 +35,12 @@ namespace error {
         UnterminatedStringLiteral(pos::Pos &&);
         void print(const std::string &) override;
     };
+    class IncompleteScientificNotation : public Error {
+        pos::Range range;
+    public:
+        IncompleteScientificNotation(pos::Range &&);
+        void print(const std::string &) override;
+    };
     class UnexpectedToken : public Error {
         pos::Range range;
     public:

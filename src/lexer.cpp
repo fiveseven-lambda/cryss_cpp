@@ -1,4 +1,6 @@
+#include <cmath>
 #include <vector>
+#include <limits>
 #include "error.hpp"
 #include "lexer.hpp"
 
@@ -7,11 +9,60 @@ Lexer::Lexer():
 Lexer::Lexer(std::ifstream &file):
     input(file, false) {}
 
+static std::int32_t to_digit(int c){
+    if('0' <= c && c <= '9'){
+        return c - '0';
+    }else switch(c){
+        case 'A': case 'a': return 10;
+        case 'B': case 'b': return 11;
+        case 'C': case 'c': return 12;
+        case 'D': case 'd': return 13;
+        case 'E': case 'e': return 14;
+        case 'F': case 'f': return 15;
+        default: return std::numeric_limits<std::int32_t>::max();
+    }
+}
+
 std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &log){
     if(!peeked){
         std::unique_ptr<token::Token> token;
         while(std::isspace(input.peek().second)) input.get(log);
         auto [start, first] = input.get(log);
+        auto exponent = [&]() -> double {
+            bool minus = false;
+            if(auto c = input.peek().second; c == '+' || c == '-'){
+                input.get(log);
+                if(c == '-') minus = true;
+            }
+            auto [pos, first] = input.get(log);
+            if(!std::isdigit(first)) throw error::make<error::IncompleteScientificNotation>(pos::Range(start, pos));
+            int ret = first - '0';
+            while(true){
+                auto c = input.peek().second;
+                if(std::isdigit(c)){
+                    input.get(log);
+                    ret = ret * 10 + (c - '0');
+                }else{
+                    if(minus) ret = -ret;
+                    return ret;
+                }
+            }
+        };
+        auto decimal = [&](double value) -> double {
+            double tmp = 1;
+            while(true){
+                auto c = input.peek().second;
+                if(std::isdigit(c)){
+                    input.get(log);
+                    value += (tmp *= .1) * (c - '0');
+                }else if(c == 'e' || c == 'E'){
+                    input.get(log);
+                    return value* std::pow(10, exponent());
+                }else{
+                    return value;
+                }
+            }
+        };
         if(first == EOF){
             token = nullptr;
         }else if(std::isalpha(first)){
@@ -126,6 +177,12 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             }else{
                 token = std::make_unique<token::Bar>();
             }
+        }else if(first == '.'){
+            if(!std::isdigit(input.peek().second)){
+                token = std::make_unique<token::Dot>();
+            }else{
+                token = std::make_unique<token::Real>(decimal(0));
+            }
         }else if(first == '+') token = std::make_unique<token::Plus>();
         else if(first == '-') token = std::make_unique<token::Hyphen>();
         else if(first == '*') token = std::make_unique<token::Asterisk>();
@@ -141,7 +198,45 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
         else if(first == ']') token = std::make_unique<token::ClosingBracket>();
         else if(first == '{') token = std::make_unique<token::OpeningBrace>();
         else if(first == '}') token = std::make_unique<token::ClosingBrace>();
-        else{
+        else if(std::isdigit(first)) do{
+            if(first == '0'){
+                auto c = input.peek().second;
+                std::int32_t radix;
+                switch(c){
+                    case 'b': radix = 2; break;
+                    case 'o': radix = 8; break;
+                    case 'x': radix = 16; break;
+                    default: radix = 0;
+                }
+                if(radix){
+                    input.get(log);
+                    std::int32_t value = 0;
+                    while(true){
+                        auto digit = to_digit(input.peek().second);
+                        if(digit >= radix) break;
+                        input.get(log);
+                        value = value * radix + digit;
+                    }
+                    token = std::make_unique<token::Integer>(value);
+                    break;
+                }
+            }
+            std::int32_t value = first - '0';
+            int c;
+            while(std::isdigit(c = input.peek().second)){
+                input.get(log);
+                value = value * 10 + (c - '0');
+            }
+            if(c == '.'){
+                input.get(log);
+                token = std::make_unique<token::Real>(decimal(value));
+            }else if(c == 'e' || c == 'E'){
+                input.get(log);
+                token = std::make_unique<token::Real>(value * std::pow(10, exponent()));
+            }else{
+                token = std::make_unique<token::Integer>(value);
+            }
+        }while(false); else{
             if(first >= 0xF0) input.get(log);
             if(first >= 0xE0) input.get(log);
             if(first >= 0xC0) input.get(log);
