@@ -141,6 +141,12 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
         else if(first == ']') token = std::make_unique<token::ClosingBracket>();
         else if(first == '{') token = std::make_unique<token::OpeningBrace>();
         else if(first == '}') token = std::make_unique<token::ClosingBrace>();
+        else{
+            if(first >= 0xF0) input.get(log);
+            if(first >= 0xE0) input.get(log);
+            if(first >= 0xC0) input.get(log);
+            throw error::make<error::UnexpectedCharacter>(pos::Range(start, input.peek().first));
+        }
         peeked = std::make_pair(pos::Range(start, input.peek().first), std::move(token));
     }
     return peeked.value();

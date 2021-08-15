@@ -14,7 +14,7 @@ namespace error {
 
     template<class Err, class... Args>
     std::unique_ptr<Error> make(Args&&... args){
-        return std::make_unique<Err>(std::move(args...));
+        return std::make_unique<Err>(std::forward<Args>(args)...);
     }
 
     class UnexpectedCharacter : public Error {
