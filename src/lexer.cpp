@@ -23,7 +23,7 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             std::string name;
             int c;
             while((c = input.get(log).second) != '"'){
-                if(c == EOF) throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnterminatedStringLiteral>(std::move(start)));
+                if(c == EOF) throw error::make<error::UnterminatedStringLiteral>(std::move(start));
                 if(c == '\\'){
                     c = input.get(log).second;
                     switch(c){
@@ -45,7 +45,7 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
                 while(!comment.empty()){
                     auto [pos, c] = input.get(log);
                     if(c == EOF){
-                        throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnterminatedComment>(std::move(comment.back())));
+                        throw error::make<error::UnterminatedComment>(std::move(comment.back()));
                     }else if(c == '*'){
                         if(input.peek().second == '/'){
                             input.get(log);

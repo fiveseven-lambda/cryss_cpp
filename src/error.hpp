@@ -2,6 +2,7 @@
 #define ERROR_HPP
 
 #include <string>
+#include <memory>
 #include "pos.hpp"
 
 namespace error {
@@ -10,6 +11,12 @@ namespace error {
         void virtual print(const std::string &) = 0;
         virtual ~Error();
     };
+
+    template<class Err, class... Args>
+    std::unique_ptr<Error> make(Args&&... args){
+        return std::make_unique<Err>(std::move(args...));
+    }
+
     class UnexpectedCharacter : public Error {
         pos::Range range;
     public:

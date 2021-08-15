@@ -13,7 +13,7 @@ static syntax::PairRangeExpression parse_factor(Lexer &lexer, std::string &log){
             }else if(auto prefix = token_ref->prefix(); prefix){
                 auto range_prefix = lexer.next(log).first;
                 auto operand = parse_factor(lexer, log);
-                if(!operand.second) throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedToken>(lexer.next(log).first));
+                if(!operand.second) throw error::make<error::UnexpectedToken>(lexer.next(log).first);
                 ret.first = std::move(range_prefix) + operand.first;
                 ret.second = std::make_unique<syntax::Unary>(prefix.value(), std::move(operand));
                 break;
@@ -25,7 +25,7 @@ static syntax::PairRangeExpression parse_factor(Lexer &lexer, std::string &log){
                     ret.second = std::make_unique<syntax::Group>(std::move(expression));
                     ret.first = std::move(range_opening_parenthesis) + range_next;
                     break;
-                }else throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedToken>(std::move(range_next)));
+                }else throw error::make<error::UnexpectedToken>(std::move(range_next));
             }
         }
         return std::make_pair(pos::Range(), nullptr);
@@ -47,13 +47,13 @@ static syntax::PairRangeExpression parse_factor(Lexer &lexer, std::string &log){
 static syntax::PairRangeExpression parse_binary_operator(Lexer &lexer, std::string &log, int precedence){
     if(precedence == 11) return parse_factor(lexer, log);
     auto left = parse_binary_operator(lexer, log, precedence + 1);
-    if(!left.second) throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedToken>(lexer.next(log).first));
+    if(!left.second) throw error::make<error::UnexpectedToken>(lexer.next(log).first);
     while(true){
         if(auto &token_ref = lexer.peek(log).second; token_ref){
             if(auto binary_operator = token_ref->binary_operator(); binary_operator && syntax::precedence(binary_operator.value()) == precedence){
                 lexer.next(log);
                 auto right = parse_binary_operator(lexer, log, precedence + 1);
-                if(!right.second) throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnexpectedToken>(lexer.next(log).first));
+                if(!right.second) throw error::make<error::UnexpectedToken>(lexer.next(log).first);
                 auto range_new = pos::add_range(left.first, right.first);
                 left.second = std::make_unique<syntax::Binary>(binary_operator.value(), std::move(left), std::move(right));
                 left.first = std::move(range_new);
