@@ -23,9 +23,8 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             std::string name;
             int c;
             while((c = input.get(log).second) != '"'){
-                if(c == EOF){
-                    throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnterminatedStringLiteral>(std::move(start)));
-                }else if(c == '\\'){
+                if(c == EOF) throw static_cast<std::unique_ptr<error::Error>>(std::make_unique<error::UnterminatedStringLiteral>(std::move(start)));
+                if(c == '\\'){
                     c = input.get(log).second;
                     switch(c){
                         case 'n': c = '\n'; break;
@@ -37,12 +36,6 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
                 name.push_back(std::char_traits<char>::to_char_type(c));
             }
             token = std::make_unique<token::String>(std::move(name));
-        }else if(first == '+'){
-            token = std::make_unique<token::Plus>();
-        }else if(first == '-'){
-            token = std::make_unique<token::Hyphen>();
-        }else if(first == '*'){
-            token = std::make_unique<token::Asterisk>();
         }else if(first == '/'){
             auto c = input.peek().second;
             if(c == '*'){
@@ -73,10 +66,6 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             }else{
                 token = std::make_unique<token::Slash>();
             }
-        }else if(first == '%'){
-            token = std::make_unique<token::Asterisk>();
-        }else if(first == '^'){
-            token = std::make_unique<token::Circumflex>();
         }else if(first == '='){
             if(input.peek().second == '='){
                 input.get(log);
@@ -137,27 +126,21 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             }else{
                 token = std::make_unique<token::Bar>();
             }
-        }else if(first == ':'){
-            token = std::make_unique<token::Colon>();
-        }else if(first == ';'){
-            token = std::make_unique<token::Semicolon>();
-        }else if(first == ','){
-            token = std::make_unique<token::Comma>();
-        }else if(first == '?'){
-            token = std::make_unique<token::Question>();
-        }else if(first == '('){
-            token = std::make_unique<token::OpeningParenthesis>();
-        }else if(first == ')'){
-            token = std::make_unique<token::ClosingParenthesis>();
-        }else if(first == '['){
-            token = std::make_unique<token::OpeningBracket>();
-        }else if(first == ']'){
-            token = std::make_unique<token::ClosingBracket>();
-        }else if(first == '{'){
-            token = std::make_unique<token::OpeningBrace>();
-        }else if(first == '}'){
-            token = std::make_unique<token::ClosingBrace>();
-        }
+        }else if(first == '+') token = std::make_unique<token::Plus>();
+        else if(first == '-') token = std::make_unique<token::Hyphen>();
+        else if(first == '*') token = std::make_unique<token::Asterisk>();
+        else if(first == '%') token = std::make_unique<token::Percent>();
+        else if(first == '^') token = std::make_unique<token::Circumflex>();
+        else if(first == ':') token = std::make_unique<token::Colon>();
+        else if(first == ';') token = std::make_unique<token::Semicolon>();
+        else if(first == ',') token = std::make_unique<token::Comma>();
+        else if(first == '?') token = std::make_unique<token::Question>();
+        else if(first == '(') token = std::make_unique<token::OpeningParenthesis>();
+        else if(first == ')') token = std::make_unique<token::ClosingParenthesis>();
+        else if(first == '[') token = std::make_unique<token::OpeningBracket>();
+        else if(first == ']') token = std::make_unique<token::ClosingBracket>();
+        else if(first == '{') token = std::make_unique<token::OpeningBrace>();
+        else if(first == '}') token = std::make_unique<token::ClosingBrace>();
         peeked = std::make_pair(pos::Range(start, input.peek().first), std::move(token));
     }
     return peeked.value();
