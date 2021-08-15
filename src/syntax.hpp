@@ -74,7 +74,7 @@ namespace syntax {
         BitAnd, BitOr, Xor,
         LogicalAnd, LogicalOr,
         LeftShift, RightShift,
-        ForwardShift, BackwardShift,
+        ForwardShift, BackwardShift
     };
     std::ostream &operator<<(std::ostream &, const BinaryOperator &); // for debug print
     int precedence(BinaryOperator);
