@@ -20,6 +20,10 @@ namespace syntax {
         right(std::move(right)) {}
     Group::Group(PairRangeExpression expression):
         expression(std::move(expression)) {}
+    Invocation::Invocation(PairRangeExpression function, std::vector<PairRangeExpression> arguments, std::unordered_map<std::string, PairRangeExpression> named_arguments):
+        function(std::move(function)),
+        arguments(std::move(arguments)),
+        named_arguments(std::move(named_arguments)) {}
 
     int precedence(BinaryOperator op){
         switch(op){
@@ -113,6 +117,21 @@ namespace syntax {
         std::cout << std::setw(indent) << "";
         std::cout << "Binary" << binary_operator << std::endl;
         right.second->print(indent + TAB);
+    }
+    void Invocation::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Invocation" << std::endl;
+        function.second->print(indent + TAB);
+        for(std::size_t i = 0; i < arguments.size(); ++i){
+            std::cout << std::setw(indent) << "";
+            std::cout << "(" << i << ")" << std::endl;
+            arguments[i].second->print(indent + TAB);
+        }
+        for(auto &[name, argument] : named_arguments){
+            std::cout << std::setw(indent) << "";
+            std::cout << "(" << name << ")" << std::endl;
+            argument.second->print(indent + TAB);
+        }
     }
 
 }

@@ -98,11 +98,13 @@ namespace syntax {
         void print(int) override;
     };
 
+    // 関数呼び出し
     class Invocation : public Expression {
         PairRangeExpression function;
         std::vector<PairRangeExpression> arguments;
         std::unordered_map<std::string, PairRangeExpression> named_arguments;
     public:
+        Invocation(PairRangeExpression, std::vector<PairRangeExpression>, std::unordered_map<std::string, PairRangeExpression>);
         void print(int) override;
     };
 }
