@@ -10,7 +10,15 @@ namespace pos {
         return os << "line " << pos.get_line() + 1;
     }
     void Pos::display(const std::string &log, std::ostream &os){
-        // pos を含む行全体を出力したい
+        auto left = log.rfind('\n', byte);
+        if(left == std::string::npos) left = 0;
+        auto right = log.find('\n', byte);
+        if(right == std::string::npos) right = log.size();
+        os
+            << log.substr(left, byte - left)
+            << " !-> "
+            << log.substr(byte, right - byte)
+            << std::endl;
     }
     Range::Range() = default;
     Range::Range(Pos start, Pos end): start(start), end(end) {}
@@ -42,6 +50,18 @@ namespace pos {
         return log.substr(start.get_byte(), end.get_byte() - start.get_byte());
     }
     void Range::display(const std::string &log, std::ostream &os){
-        // range を含む行全体を出力したい
+        auto start_byte = start.get_byte();
+        auto end_byte = end.get_byte();
+        auto left = log.rfind('\n', start_byte);
+        if(left == std::string::npos) left = 0;
+        auto right = log.find('\n', end_byte);
+        if(right == std::string::npos) right = log.size();
+        os
+            << log.substr(left, start_byte - left)
+            << " !-> "
+            << log.substr(start_byte, end_byte - start_byte)
+            << " <-! "
+            << log.substr(end_byte, right - end_byte)
+            << std::endl;
     }
 }
