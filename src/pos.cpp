@@ -12,6 +12,7 @@ namespace pos {
     void Pos::display(const std::string &log, std::ostream &os){
         auto left = log.rfind('\n', byte);
         if(left == std::string::npos) left = 0;
+        else ++left;
         auto right = log.find('\n', byte);
         if(right == std::string::npos) right = log.size();
         os
@@ -54,6 +55,7 @@ namespace pos {
         auto end_byte = end.get_byte();
         auto left = log.rfind('\n', start_byte);
         if(left == std::string::npos) left = 0;
+        else ++left;
         auto right = log.find('\n', end_byte);
         if(right == std::string::npos) right = log.size();
         os
