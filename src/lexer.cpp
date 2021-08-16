@@ -28,7 +28,7 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
         std::unique_ptr<token::Token> token;
         while(std::isspace(input.peek().second)) input.get(log);
         auto [start, first] = input.get(log);
-        auto exponent = [&]() -> double {
+        auto exponent = [&, &start = start]() -> double {
             bool minus = false;
             if(auto c = input.peek().second; c == '+' || c == '-'){
                 input.get(log);

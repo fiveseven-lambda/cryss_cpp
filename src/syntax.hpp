@@ -9,6 +9,7 @@
 
 #include "pos.hpp"
 
+
 // for debug print
 #include <iostream>
 #include <iomanip>
