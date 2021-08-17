@@ -141,6 +141,14 @@ namespace syntax {
         void compile(std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
         void print(int) override;
     };
+
+    class Substitution : public Sentence {
+        PairRangeExpression left, right;
+    public:
+        Substitution(PairRangeExpression);
+        void compile(std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        void print(int) override;
+    };
 }
 
 #endif

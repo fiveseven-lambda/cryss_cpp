@@ -1,6 +1,7 @@
 #include "syntax.hpp"
 #include "context.hpp"
 #include "error.hpp"
+#include "value.hpp"
 
 #include "llvm/IR/Constants.h"
 
@@ -75,20 +76,38 @@ namespace syntax {
     }
     llvm::Value *String::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
     llvm::Value *Unary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
-        auto operand_value = operand.second->llvm_value(variables, operand.first);
+        auto operand_value = value::Value(operand.second->llvm_value(variables, operand.first));
         switch(unary_operator){
         case UnaryOperator::Minus:
-            if(operand_value->getType() == integer_type) return builder->CreateNeg(operand_value);
-            else if(operand_value->getType() == double_type) return builder->CreateNeg(operand_value);
-            break;
+            if(auto value = operand_value.require(integer_type)) return builder->CreateNeg(value);
+            else if(auto value = operand_value.require(double_type)) return builder->CreateNeg(value);
+            else break;
         case UnaryOperator::Reciprocal:
-            if(operand_value->getType() == double_type) return builder->CreateFDiv(llvm::ConstantFP::get(double_type, 1), operand_value);
-            break;
+            if(auto value = operand_value.require(double_type)) return builder->CreateFDiv(llvm::ConstantFP::get(double_type, 1), value);
+            else break;
         default:;
         }
-        throw error::make<error::TypeMismatch>(std::move(operand.first));
+        throw error::make<error::TypeMismatch>(range.clone());
     }
-    llvm::Value *Binary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
+    llvm::Value *Binary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
+        auto left_value = value::Value(left.second->llvm_value(variables, left.first));
+        auto right_value = value::Value(right.second->llvm_value(variables, right.first));
+        switch(binary_operator){
+        case BinaryOperator::Add:
+            if(auto left = left_value.require(integer_type), right = right_value.require(integer_type); left && right) return builder->CreateAdd(left, right);
+            else if(auto left = left_value.require(double_type), right = right_value.require(double_type); left && right) return builder->CreateAdd(left, right);
+            else break;
+        case BinaryOperator::Sub:
+            if(auto left = left_value.require(integer_type), right = right_value.require(integer_type); left && right) return builder->CreateSub(left, right);
+            else if(auto left = left_value.require(double_type), right = right_value.require(double_type); left && right) return builder->CreateSub(left, right);
+            else break;
+        case BinaryOperator::Mul:
+            if(auto left = left_value.require(integer_type), right = right_value.require(integer_type); left && right) return builder->CreateMul(left, right);
+            else if(auto left = left_value.require(double_type), right = right_value.require(double_type); left && right) return builder->CreateMul(left, right);
+            else break;
+        }
+        throw error::make<error::TypeMismatch>(range.clone());
+    }
     llvm::Value *Group::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
     llvm::Value *Invocation::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
 
