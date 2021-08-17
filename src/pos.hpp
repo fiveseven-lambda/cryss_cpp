@@ -24,6 +24,7 @@ namespace pos {
         Range(Pos, Pos);
         Range(Range &&);
         Range &operator=(Range &&);
+        Range &&clone() const;
         Pos get_start() const, get_end() const;
         Range &operator+=(const Range &), &operator-=(const Range &);
         std::string substr(const std::string &);

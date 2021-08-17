@@ -8,6 +8,6 @@
 #include "lexer.hpp"
 #include "syntax.hpp"
 
-syntax::PairRangeExpression parse_expression(Lexer &, std::string &);
+syntax::PairRangeSentence parse_sentence(Lexer &, std::string &);
 
 #endif

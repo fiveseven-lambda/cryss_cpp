@@ -40,4 +40,17 @@ namespace error {
         range.display(log);
     }
 
+    UndefinedVariable::UndefinedVariable(pos::Range &&range):
+        range(std::move(range)) {}
+    void UndefinedVariable::print(const std::string &log){
+        std::cerr << "undefined variable `" << range.substr(log) << "` at " << range << std::endl;
+        range.display(log);
+    }
+
+    TypeMismatch::TypeMismatch(pos::Range &&range):
+        range(std::move(range)) {}
+    void TypeMismatch::print(const std::string &log){
+        std::cerr << "type mismatch at " << range << std::endl;
+        range.display(log);
+    }
 }

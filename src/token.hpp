@@ -17,7 +17,7 @@ namespace token {
         virtual std::unique_ptr<syntax::Expression> factor();
         virtual std::optional<syntax::UnaryOperator> prefix();
         virtual std::optional<syntax::BinaryOperator> binary_operator();
-        virtual bool is_question(), is_opening_parenthesis(), is_closing_parenthesis();
+        virtual bool is_question(), is_opening_parenthesis(), is_closing_parenthesis(), is_semicolon();
     };
     class Identifier : public Token {
         std::string name;
@@ -113,7 +113,9 @@ namespace token {
         std::optional<syntax::BinaryOperator> binary_operator() override;
     };
     class Colon : public Token {};
-    class Semicolon : public Token {};
+    class Semicolon : public Token {
+        bool is_semicolon() override;
+    };
     class Comma : public Token {};
     class Dot : public Token {};
     class Question : public Token {

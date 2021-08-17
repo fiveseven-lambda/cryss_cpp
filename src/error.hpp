@@ -47,5 +47,17 @@ namespace error {
         UnexpectedToken(pos::Range &&);
         void print(const std::string &) override;
     };
+    class UndefinedVariable : public Error {
+        pos::Range range;
+    public:
+        UndefinedVariable(pos::Range &&);
+        void print(const std::string &) override;
+    };
+    class TypeMismatch : public Error {
+        pos::Range range;
+    public:
+        TypeMismatch(pos::Range &&);
+        void print(const std::string &) override;
+    };
 }
 #endif

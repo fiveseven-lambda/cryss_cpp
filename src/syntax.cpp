@@ -1,4 +1,8 @@
 #include "syntax.hpp"
+#include "context.hpp"
+#include "error.hpp"
+
+#include "llvm/IR/Constants.h"
 
 namespace syntax {
     Expression::~Expression() = default;
@@ -53,6 +57,44 @@ namespace syntax {
 
     std::optional<std::string> Expression::identifier(){ return std::nullopt; }
     std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+
+    Sentence::~Sentence() = default;
+    ExpressionSentence::ExpressionSentence(PairRangeExpression expression):
+        expression(std::move(expression)) {}
+
+    llvm::Value *Identifier::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
+        auto iter = variables.find(name);
+        if(iter == variables.end()) throw error::make<error::UndefinedVariable>(range.clone());
+        return iter->second;
+    }
+    llvm::Value *Integer::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){
+        return llvm::ConstantInt::get(integer_type, value, true);
+    }
+    llvm::Value *Real::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){
+        return llvm::ConstantFP::get(double_type, value);
+    }
+    llvm::Value *String::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
+    llvm::Value *Unary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
+        auto operand_value = operand.second->llvm_value(variables, operand.first);
+        switch(unary_operator){
+        case UnaryOperator::Minus:
+            if(operand_value->getType() == integer_type) return builder->CreateNeg(operand_value);
+            else if(operand_value->getType() == double_type) return builder->CreateNeg(operand_value);
+            break;
+        case UnaryOperator::Reciprocal:
+            if(operand_value->getType() == double_type) return builder->CreateFDiv(llvm::ConstantFP::get(double_type, 1), operand_value);
+            break;
+        default:;
+        }
+        throw error::make<error::TypeMismatch>(std::move(operand.first));
+    }
+    llvm::Value *Binary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
+    llvm::Value *Group::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
+    llvm::Value *Invocation::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
+
+    void ExpressionSentence::compile(std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
+        builder->CreateRet(expression.second->llvm_value(variables, expression.first));
+    }
 
     // for debug
     constexpr int TAB = 4;
@@ -136,6 +178,11 @@ namespace syntax {
             std::cout << "(" << name << ")" << std::endl;
             argument.second->print(indent + TAB);
         }
+    }
+    void ExpressionSentence::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "ExpressionSentence" << std::endl;
+        if(expression.second) expression.second->print(indent + TAB);
     }
 
 }

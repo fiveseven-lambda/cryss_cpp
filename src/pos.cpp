@@ -25,6 +25,9 @@ namespace pos {
     Range::Range(Pos start, Pos end): start(start), end(end) {}
     Range::Range(Range &&) = default;
     Range &Range::operator=(Range &&) = default;
+    Range &&Range::clone() const {
+        return std::move(Range(start, end));
+    }
     Range &Range::operator+=(const Range &other) {
         end = other.end;
         return *this;
