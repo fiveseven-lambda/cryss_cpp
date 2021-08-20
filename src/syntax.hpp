@@ -11,6 +11,9 @@
 
 #include "llvm/IR/Value.h"
 
+#include "type.hpp"
+#include "value.hpp"
+
 // for debug print
 #include <iostream>
 #include <iomanip>
@@ -20,7 +23,7 @@ namespace syntax {
     public:
         virtual ~Expression();
         virtual std::optional<std::string> identifier();
-        virtual llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) = 0;
+        virtual value::Value llvm_value(const Variables &, const pos::Range &) = 0;
 
         // FOR DEBUG
         virtual void print(int = 0) = 0;
@@ -34,7 +37,7 @@ namespace syntax {
     public:
         Identifier(std::string &&);
         std::optional<std::string> identifier() override;
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -43,7 +46,7 @@ namespace syntax {
         std::int32_t value;
     public:
         Integer(std::int32_t);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -52,7 +55,7 @@ namespace syntax {
         double value;
     public:
         Real(double);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -61,7 +64,7 @@ namespace syntax {
         std::string value;
     public:
         String(std::string &&);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -77,7 +80,7 @@ namespace syntax {
         PairRangeExpression operand;
     public:
         Unary(UnaryOperator, PairRangeExpression);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -99,7 +102,7 @@ namespace syntax {
         PairRangeExpression left, right;
     public:
         Binary(BinaryOperator, PairRangeExpression, PairRangeExpression);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -108,7 +111,7 @@ namespace syntax {
         PairRangeExpression expression;
     public:
         Group(PairRangeExpression);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -119,14 +122,14 @@ namespace syntax {
         std::unordered_map<std::string, PairRangeExpression> named_arguments;
     public:
         Invocation(PairRangeExpression, std::vector<PairRangeExpression>, std::unordered_map<std::string, PairRangeExpression>);
-        llvm::Value *llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        value::Value llvm_value(const Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
     class Sentence {
     public:
         virtual ~Sentence();
-        virtual void compile(std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) = 0;
+        virtual void compile(Variables &, const pos::Range &) = 0;
 
         // for debug print
         virtual void print(int = 0) = 0;
@@ -138,7 +141,7 @@ namespace syntax {
         PairRangeExpression expression;
     public:
         ExpressionSentence(PairRangeExpression);
-        void compile(std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        void compile(Variables &, const pos::Range &) override;
         void print(int) override;
     };
 
@@ -146,7 +149,7 @@ namespace syntax {
         PairRangeExpression left, right;
     public:
         Substitution(PairRangeExpression);
-        void compile(std::unordered_map<std::string, llvm::Value *> &, const pos::Range &) override;
+        void compile(Variables &, const pos::Range &) override;
         void print(int) override;
     };
 }

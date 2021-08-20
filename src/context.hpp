@@ -10,7 +10,7 @@
 extern llvm::orc::ThreadSafeContext context;
 extern std::unique_ptr<llvm::IRBuilder<llvm::ConstantFolder, llvm::IRBuilderDefaultInserter>> builder;
 
-extern llvm::IntegerType *integer_type;
-extern llvm::Type *double_type;
+extern llvm::Type *integer_type;
+extern llvm::Type *real_type;
 
 #endif

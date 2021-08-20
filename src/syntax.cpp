@@ -63,56 +63,16 @@ namespace syntax {
     ExpressionSentence::ExpressionSentence(PairRangeExpression expression):
         expression(std::move(expression)) {}
 
-    llvm::Value *Identifier::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
-        auto iter = variables.find(name);
-        if(iter == variables.end()) throw error::make<error::UndefinedVariable>(range.clone());
-        return iter->second;
-    }
-    llvm::Value *Integer::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){
-        return llvm::ConstantInt::get(integer_type, value, true);
-    }
-    llvm::Value *Real::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){
-        return llvm::ConstantFP::get(double_type, value);
-    }
-    llvm::Value *String::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
-    llvm::Value *Unary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
-        auto operand_value = value::Value(operand.second->llvm_value(variables, operand.first));
-        switch(unary_operator){
-        case UnaryOperator::Minus:
-            if(auto value = operand_value.require(integer_type)) return builder->CreateNeg(value);
-            else if(auto value = operand_value.require(double_type)) return builder->CreateNeg(value);
-            else break;
-        case UnaryOperator::Reciprocal:
-            if(auto value = operand_value.require(double_type)) return builder->CreateFDiv(llvm::ConstantFP::get(double_type, 1), value);
-            else break;
-        default:;
-        }
-        throw error::make<error::TypeMismatch>(range.clone());
-    }
-    llvm::Value *Binary::llvm_value(const std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
-        auto left_value = value::Value(left.second->llvm_value(variables, left.first));
-        auto right_value = value::Value(right.second->llvm_value(variables, right.first));
-        switch(binary_operator){
-        case BinaryOperator::Add:
-            if(auto left = left_value.require(integer_type), right = right_value.require(integer_type); left && right) return builder->CreateAdd(left, right);
-            else if(auto left = left_value.require(double_type), right = right_value.require(double_type); left && right) return builder->CreateAdd(left, right);
-            else break;
-        case BinaryOperator::Sub:
-            if(auto left = left_value.require(integer_type), right = right_value.require(integer_type); left && right) return builder->CreateSub(left, right);
-            else if(auto left = left_value.require(double_type), right = right_value.require(double_type); left && right) return builder->CreateSub(left, right);
-            else break;
-        case BinaryOperator::Mul:
-            if(auto left = left_value.require(integer_type), right = right_value.require(integer_type); left && right) return builder->CreateMul(left, right);
-            else if(auto left = left_value.require(double_type), right = right_value.require(double_type); left && right) return builder->CreateMul(left, right);
-            else break;
-        }
-        throw error::make<error::TypeMismatch>(range.clone());
-    }
-    llvm::Value *Group::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
-    llvm::Value *Invocation::llvm_value(const std::unordered_map<std::string, llvm::Value *> &, const pos::Range &){}
+    value::Value Identifier::llvm_value(const Variables &, const pos::Range &){}
+    value::Value Integer::llvm_value(const Variables &, const pos::Range &){}
+    value::Value Real::llvm_value(const Variables &, const pos::Range &){}
+    value::Value String::llvm_value(const Variables &, const pos::Range &){}
+    value::Value Unary::llvm_value(const Variables &, const pos::Range &){}
+    value::Value Binary::llvm_value(const Variables &, const pos::Range &){}
+    value::Value Group::llvm_value(const Variables &, const pos::Range &){}
+    value::Value Invocation::llvm_value(const Variables &, const pos::Range &){}
 
-    void ExpressionSentence::compile(std::unordered_map<std::string, llvm::Value *> &variables, const pos::Range &range){
-        builder->CreateRet(expression.second->llvm_value(variables, expression.first));
+    void ExpressionSentence::compile(Variables &variables, const pos::Range &range){
     }
 
     // for debug
