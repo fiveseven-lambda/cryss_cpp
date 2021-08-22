@@ -12,6 +12,9 @@ namespace token {
     String::String(std::string &&value):
         value(std::move(value)) {}
 
+    std::optional<std::string> Token::identifier(){ return std::nullopt; }
+    std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+
     std::unique_ptr<syntax::Expression> Token::factor(){ return nullptr; }
     std::unique_ptr<syntax::Expression> Identifier::factor(){ return std::make_unique<syntax::Identifier>(std::move(name)); }
     std::unique_ptr<syntax::Expression> Integer::factor(){ return std::make_unique<syntax::Integer>(value); }
@@ -53,4 +56,8 @@ namespace token {
     bool ClosingParenthesis::is_closing_parenthesis(){ return true; }
     bool Token::is_semicolon(){ return false; }
     bool Semicolon::is_semicolon(){ return true; }
+    bool Token::is_equal(){ return false; }
+    bool Equal::is_equal(){ return true; }
+    bool Token::is_keyword_let(){ return false; }
+    bool KeywordLet::is_keyword_let(){ return true; }
 }

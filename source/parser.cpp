@@ -77,10 +77,48 @@ syntax::PairRangeSentence parse_sentence(Lexer &lexer, std::string &log){
     auto expression = parse_expression(lexer, log);
     auto [range_next, next] = lexer.next(log);
     if(!expression.second && !next){
+        // 読める式がなく，ファイル終端
+        // →終わり
         return std::make_pair(std::move(expression.first), nullptr);
     }
     if(next->is_semicolon()){
+        // 式 ;
+        // 空の式にセミコロンだけも許す
         return std::make_pair(std::move(range_next) - expression.first, std::make_unique<syntax::ExpressionSentence>(std::move(expression)));
+    }
+    if(expression.second && next->is_equal()){
+        // 式 = 
+        // 左辺（空ではない）と = があったので
+        // expression は左辺
+        // next はイコール
+        if(expression.second->is_lvalue()){
+            // 右辺を読む
+            auto rhs = parse_expression(lexer, log);
+            auto [range_next2, next2] = lexer.next(log);
+            // 右辺 ; になってるとよし
+            if(rhs.second && next2->is_semicolon()){
+                // rhs は右辺
+                // next2 はセミコロン
+                return std::make_pair(std::move(range_next2) - expression.first, std::make_unique<syntax::Substitution>(std::move(expression), std::move(rhs)));
+            }
+        }
+    }
+    if(!expression.second && next->is_keyword_let()){
+        // let があった
+        auto [range_next2, next2] = lexer.next(log);
+        // これは識別子名になっててほしい
+        if(auto name = next2->identifier()){
+            auto [range_equal, equal] = lexer.next(log);
+            if(equal->is_equal()){
+                // 右辺を読む
+                auto rhs = parse_expression(lexer, log);
+                auto [range_semicolon, semicolon] = lexer.next(log);
+                // 式 ;
+                if(rhs.second && semicolon->is_semicolon()){
+                    return std::make_pair(std::move(range_semicolon) - range_next, std::make_unique<syntax::Declaration>(std::move(name.value()), std::move(rhs)));
+                }
+            }
+        }
     }
     throw error::make<error::UnexpectedToken>(std::move(range_next));
 }

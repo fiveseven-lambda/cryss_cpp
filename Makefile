@@ -8,5 +8,5 @@ cryss:$(OBJS)
 	$(CXX) $(LDFLAGS) -ocryss $(OBJS)
 obj/%.o: source/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o$@ $<
-weverything:source/*
+all:source/*
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -Weverything -Wno-shadow-field-in-constructor -Wno-padded -Wno-c++98-compat -ocryss $(SOURCES)

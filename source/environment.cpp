@@ -2,8 +2,11 @@
 #include "environment.hpp"
 
 namespace environment {
-    Environment::Environment(){
-    }
-    bool Environment::run(syntax::PairRangeSentence sentence){
+    Environment::Environment():
+        number(0) {}
+    void Environment::run(syntax::PairRangeSentence sentence){
+        sentence.second->print();
+        sentence.second->run(global_variables, sentence.first, number);
+        ++number;
     }
 }

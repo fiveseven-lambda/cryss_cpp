@@ -6,6 +6,8 @@ namespace value {
         value(value),
         type(std::move(type)) {}
     llvm::Value *Value::require(std::unique_ptr<type::Type> required){
-        return nullptr;
+        // type が bool, required が bool → value を返す
+        // type が bool, required が integer → value をキャストして返す
+        return type->require(std::move(required), value);
     }
 }

@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "pos.hpp"
+#include "variable.hpp"
 
 #include "llvm/IR/Value.h"
 
@@ -22,8 +23,8 @@ namespace syntax {
     class Expression {
     public:
         virtual ~Expression();
-        virtual std::optional<std::string> identifier();
-        virtual value::Value llvm_value(const Variables &, const pos::Range &) = 0;
+        virtual bool is_lvalue();
+        virtual value::Value rvalue(const Variables &, pos::Range &) = 0;
 
         // FOR DEBUG
         virtual void print(int = 0) = 0;
@@ -36,8 +37,8 @@ namespace syntax {
         std::string name;
     public:
         Identifier(std::string &&);
-        std::optional<std::string> identifier() override;
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        bool is_lvalue() override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -46,7 +47,7 @@ namespace syntax {
         std::int32_t value;
     public:
         Integer(std::int32_t);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -55,7 +56,7 @@ namespace syntax {
         double value;
     public:
         Real(double);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -64,7 +65,7 @@ namespace syntax {
         std::string value;
     public:
         String(std::string &&);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -80,7 +81,7 @@ namespace syntax {
         PairRangeExpression operand;
     public:
         Unary(UnaryOperator, PairRangeExpression);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -102,7 +103,7 @@ namespace syntax {
         PairRangeExpression left, right;
     public:
         Binary(BinaryOperator, PairRangeExpression, PairRangeExpression);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -111,7 +112,7 @@ namespace syntax {
         PairRangeExpression expression;
     public:
         Group(PairRangeExpression);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -122,14 +123,15 @@ namespace syntax {
         std::unordered_map<std::string, PairRangeExpression> named_arguments;
     public:
         Invocation(PairRangeExpression, std::vector<PairRangeExpression>, std::unordered_map<std::string, PairRangeExpression>);
-        value::Value llvm_value(const Variables &, const pos::Range &) override;
+        value::Value rvalue(const Variables &, pos::Range &) override;
         void print(int) override;
     };
 
     class Sentence {
     public:
         virtual ~Sentence();
-        virtual void compile(Variables &, const pos::Range &) = 0;
+        virtual void compile(Variables &, GlobalVariables &, pos::Range &) = 0;
+        void run(GlobalVariables &, pos::Range &, int);
 
         // for debug print
         virtual void print(int = 0) = 0;
@@ -141,15 +143,24 @@ namespace syntax {
         PairRangeExpression expression;
     public:
         ExpressionSentence(PairRangeExpression);
-        void compile(Variables &, const pos::Range &) override;
+        void compile(Variables &, GlobalVariables &, pos::Range &) override;
         void print(int) override;
     };
 
     class Substitution : public Sentence {
         PairRangeExpression left, right;
     public:
-        Substitution(PairRangeExpression);
-        void compile(Variables &, const pos::Range &) override;
+        Substitution(PairRangeExpression, PairRangeExpression);
+        void compile(Variables &, GlobalVariables &, pos::Range &) override;
+        void print(int) override;
+    };
+
+    class Declaration : public Sentence {
+        std::string name;
+        PairRangeExpression expression;
+    public:
+        Declaration(std::string, PairRangeExpression);
+        void compile(Variables &, GlobalVariables &, pos::Range &) override;
         void print(int) override;
     };
 }

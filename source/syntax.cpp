@@ -4,6 +4,7 @@
 #include "value.hpp"
 
 #include "llvm/IR/Constants.h"
+#include "llvm/IR/Module.h"
 
 namespace syntax {
     Expression::~Expression() = default;
@@ -56,24 +57,66 @@ namespace syntax {
         std::terminate();
     }
 
-    std::optional<std::string> Expression::identifier(){ return std::nullopt; }
-    std::optional<std::string> Identifier::identifier(){ return std::move(name); }
+    bool Expression::is_lvalue(){ return false; }
+    bool Identifier::is_lvalue(){ return true; }
 
     Sentence::~Sentence() = default;
     ExpressionSentence::ExpressionSentence(PairRangeExpression expression):
         expression(std::move(expression)) {}
+    Substitution::Substitution(PairRangeExpression left, PairRangeExpression right):
+        left(std::move(left)), right(std::move(right)) {}
+    Declaration::Declaration(std::string name, PairRangeExpression expression):
+        name(std::move(name)), expression(std::move(expression)) {}
 
-    value::Value Identifier::llvm_value(const Variables &, const pos::Range &){}
-    value::Value Integer::llvm_value(const Variables &, const pos::Range &){}
-    value::Value Real::llvm_value(const Variables &, const pos::Range &){}
-    value::Value String::llvm_value(const Variables &, const pos::Range &){}
-    value::Value Unary::llvm_value(const Variables &, const pos::Range &){}
-    value::Value Binary::llvm_value(const Variables &, const pos::Range &){}
-    value::Value Group::llvm_value(const Variables &, const pos::Range &){}
-    value::Value Invocation::llvm_value(const Variables &, const pos::Range &){}
-
-    void ExpressionSentence::compile(Variables &variables, const pos::Range &range){
+    value::Value Identifier::rvalue(const Variables &variables, pos::Range &range){
+        auto it = variables.find(name);
+        if(it == variables.end()){
+            throw error::make<error::UndefinedVariable>(std::move(range));
+        }
+        return it->second.value();
     }
+    value::Value Integer::rvalue(const Variables &, pos::Range &){
+        return value::Value(llvm::ConstantInt::get(integer_type, value), std::make_unique<type::Integer>());
+    }
+    value::Value Real::rvalue(const Variables &, pos::Range &){
+        return value::Value(llvm::ConstantFP::get(real_type, value), std::make_unique<type::Real>());
+    }
+    value::Value String::rvalue(const Variables &, pos::Range &){}
+    value::Value Unary::rvalue(const Variables &variables, pos::Range &){
+        auto operand_result = operand.second->rvalue(variables, operand.first);
+        switch(unary_operator){
+        case UnaryOperator::Minus:
+            if(auto operand_value = operand_result.require(std::make_unique<type::Integer>())){
+                return value::Value(builder.CreateNeg(operand_value), std::make_unique<type::Integer>());
+            }
+            break;
+        }
+        throw error::make<error::TypeMismatch>(std::move(operand.first));
+    }
+    value::Value Binary::rvalue(const Variables &, pos::Range &){}
+    value::Value Group::rvalue(const Variables &, pos::Range &){}
+    value::Value Invocation::rvalue(const Variables &, pos::Range &){}
+
+    void Sentence::run(GlobalVariables &global_variables, pos::Range &range, int number){
+        auto mod = std::make_unique<llvm::Module>("", *context.getContext());
+        auto variables = declare(global_variables, *mod);
+        std::stringstream ss;
+        ss << number;
+        auto function = llvm::Function::Create(function_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, ss.str(), *mod);
+        auto basic_block = llvm::BasicBlock::Create(*context.getContext(), "entry", function);
+        builder.SetInsertPoint(basic_block);
+        compile(variables, global_variables, range);
+        mod->print(llvm::errs(), nullptr);
+        jit->addIRModule(llvm::orc::ThreadSafeModule(std::move(mod), context));
+        auto compiled = reinterpret_cast<int (*)()>(jit->lookup(ss.str()).get().getAddress());
+        std::cout << compiled() << std::endl;
+    }
+    void ExpressionSentence::compile(Variables &variables, GlobalVariables &global_variables, pos::Range &){
+        // ちょっと今だけ関数に値を返させる　あとで消す
+        builder.CreateRet(expression.second->rvalue(variables, expression.first).value);
+    }
+    void Substitution::compile(Variables &variables, GlobalVariables &, pos::Range &){ }
+    void Declaration::compile(Variables &variables, GlobalVariables &, pos::Range &){ }
 
     // for debug
     constexpr int TAB = 4;
@@ -161,6 +204,17 @@ namespace syntax {
     void ExpressionSentence::print(int indent){
         std::cout << std::setw(indent) << "";
         std::cout << "ExpressionSentence" << std::endl;
+        if(expression.second) expression.second->print(indent + TAB);
+    }
+    void Substitution::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Substitution" << std::endl;
+        if(left.second) left.second->print(indent + TAB);
+        if(right.second) right.second->print(indent + TAB);
+    }
+    void Declaration::print(int indent){
+        std::cout << std::setw(indent) << "";
+        std::cout << "Declaration: " << name << std::endl;
         if(expression.second) expression.second->print(indent + TAB);
     }
 

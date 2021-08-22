@@ -69,7 +69,11 @@ std::pair<pos::Range, std::unique_ptr<token::Token>> &Lexer::peek(std::string &l
             std::string name(1, std::char_traits<char>::to_char_type(first));
             while(std::isalnum(input.peek().second))
                 name.push_back(std::char_traits<char>::to_char_type(input.get(log).second));
-            token = std::make_unique<token::Identifier>(std::move(name));
+            if(name == "let"){
+                token = std::make_unique<token::KeywordLet>();
+            }else{
+                token = std::make_unique<token::Identifier>(std::move(name));
+            }
         }else if(first == '"'){
             std::string name;
             int c;

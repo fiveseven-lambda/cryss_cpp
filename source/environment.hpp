@@ -5,8 +5,10 @@
 
 namespace environment {
     class Environment {
+        GlobalVariables global_variables;
+        int number;
     public:
         Environment();
-        bool run(syntax::PairRangeSentence);
+        void run(syntax::PairRangeSentence);
     };
 }

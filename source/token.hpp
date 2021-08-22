@@ -17,13 +17,19 @@ namespace token {
         virtual std::unique_ptr<syntax::Expression> factor();
         virtual std::optional<syntax::UnaryOperator> prefix();
         virtual std::optional<syntax::BinaryOperator> binary_operator();
-        virtual bool is_question(), is_opening_parenthesis(), is_closing_parenthesis(), is_semicolon();
+        virtual std::optional<std::string> identifier();
+        virtual bool is_question(), is_opening_parenthesis(), is_closing_parenthesis(), is_semicolon(), is_equal(), is_keyword_let();
     };
     class Identifier : public Token {
         std::string name;
     public:
         Identifier(std::string &&);
+        std::optional<std::string> identifier() override;
         std::unique_ptr<syntax::Expression> factor() override;
+    };
+    class KeywordLet : public Token {
+    public:
+        bool is_keyword_let() override;
     };
     class Integer : public Token {
         std::int32_t value;
@@ -62,7 +68,10 @@ namespace token {
     class Percent : public Token {
         std::optional<syntax::BinaryOperator> binary_operator() override;
     };
-    class Equal : public Token {};
+    class Equal : public Token {
+    public:
+        bool is_equal() override;
+    };
     class DoubleEqual : public Token {
         std::optional<syntax::BinaryOperator> binary_operator() override;
     };

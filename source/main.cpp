@@ -5,7 +5,23 @@
 #include "parser.hpp"
 #include "environment.hpp"
 
+#include "llvm/ExecutionEngine/Orc/LLJIT.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+
+std::unique_ptr<llvm::orc::LLJIT> jit;
+
 int main(){
+    LLVMInitializeNativeTarget();
+    jit = std::move(llvm::orc::LLJITBuilder().create().get());
+    LLVMInitializeNativeAsmPrinter();
+
+
+    std::make_unique<type::Integer>()->from_integer(nullptr); // OK
+    std::make_unique<type::Integer>()->require(std::make_unique<type::Integer>(), nullptr); // NG
+    // ↑ これは何……？？？
+
+
+
     Lexer lexer;
     std::string log;
 
@@ -13,9 +29,8 @@ int main(){
     try{
         while(true){
             auto sentence = parse_sentence(lexer, log);
-            if(!environment.run(std::move(sentence))){
-                break;
-            }
+            if(!sentence.second) break;
+            environment.run(std::move(sentence));
         }
     }catch(std::unique_ptr<error::Error> &err){
         err->print(log);

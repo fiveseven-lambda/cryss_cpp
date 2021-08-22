@@ -6,6 +6,7 @@
 
 namespace value {
     class Value {
+    public: // 一時的に public にする，あとで消す
         llvm::Value *value;
         std::unique_ptr<type::Type> type;
     public:
