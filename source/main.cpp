@@ -15,13 +15,6 @@ int main(){
     jit = std::move(llvm::orc::LLJITBuilder().create().get());
     LLVMInitializeNativeAsmPrinter();
 
-
-    std::make_unique<type::Integer>()->from_integer(nullptr); // OK
-    std::make_unique<type::Integer>()->require(std::make_unique<type::Integer>(), nullptr); // NG
-    // ↑ これは何……？？？
-
-
-
     Lexer lexer;
     std::string log;
 

@@ -38,9 +38,9 @@ namespace type {
         return std::make_unique<Function>(std::move(new_argument_types), result_type->clone());
     }
     llvm::Value *Type::require(std::unique_ptr<Type>, llvm::Value *){ return nullptr; }
-    llvm::Value *Boolean::require(std::unique_ptr<Type> type, llvm::Value *value){ type->from_boolean(value); }
-    llvm::Value *Integer::require(std::unique_ptr<Type> type, llvm::Value *value){ type->from_integer(value); }
-    llvm::Value *Real::require(std::unique_ptr<Type> type, llvm::Value *value){ type->from_real(value); }
+    llvm::Value *Boolean::require(std::unique_ptr<Type> type, llvm::Value *value){ return type->from_boolean(value); }
+    llvm::Value *Integer::require(std::unique_ptr<Type> type, llvm::Value *value){ return type->from_integer(value); }
+    llvm::Value *Real::require(std::unique_ptr<Type> type, llvm::Value *value){ return type->from_real(value); }
     llvm::Value *Type::from_boolean(llvm::Value *){ return nullptr; }
     llvm::Value *Boolean::from_boolean(llvm::Value *value){ return value; }
     llvm::Value *Type::from_integer(llvm::Value *){ return nullptr; }
