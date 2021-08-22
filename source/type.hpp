@@ -36,7 +36,7 @@ namespace type {
         llvm::Type *llvm_type() override;
         std::unique_ptr<Type> clone() override;
         llvm::Value *require(std::unique_ptr<Type>, llvm::Value *) override;
-        llvm::Value *from_real(llvm::Value *) override;
+        llvm::Value *from_real(llvm::Value *) override, *from_integer(llvm::Value *) override;
     };
     class String : public Type {
     public:

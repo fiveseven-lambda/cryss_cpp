@@ -90,6 +90,11 @@ namespace syntax {
                 return value::Value(builder.CreateNeg(operand_value), std::make_unique<type::Integer>());
             }
             break;
+        case UnaryOperator::Reciprocal:
+            if(auto operand_value = operand_result.require(std::make_unique<type::Real>())){
+                return value::Value(builder.CreateFDiv(llvm::ConstantFP::get(real_type, 1), operand_value), std::make_unique<type::Real>());
+            }
+            break;
         }
         throw error::make<error::TypeMismatch>(std::move(operand.first));
     }

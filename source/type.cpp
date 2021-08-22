@@ -1,8 +1,7 @@
 
 #include "type.hpp"
+#include "context.hpp"
 #include "llvm/IR/LLVMContext.h"
-
-extern llvm::Type *boolean_type, *integer_type, *real_type;
 
 namespace type {
     Type::~Type() = default;
@@ -45,6 +44,7 @@ namespace type {
     llvm::Value *Boolean::from_boolean(llvm::Value *value){ return value; }
     llvm::Value *Type::from_integer(llvm::Value *){ return nullptr; }
     llvm::Value *Integer::from_integer(llvm::Value *value){ return value; }
+    llvm::Value *Real::from_integer(llvm::Value *value){ return builder.CreateSIToFP(value, real_type); }
     llvm::Value *Type::from_real(llvm::Value *){ return nullptr; }
     llvm::Value *Real::from_real(llvm::Value *value){ return value; }
 }
