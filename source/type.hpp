@@ -14,28 +14,30 @@ namespace type {
         virtual llvm::Type *llvm_type() = 0;
         virtual ~Type();
         virtual std::unique_ptr<Type> clone() = 0;
-        virtual llvm::Value *require(std::unique_ptr<Type>, llvm::Value *);
+        virtual llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *);
+        virtual llvm::Constant *default_value();
         virtual llvm::Value *from_boolean(llvm::Value *), *from_integer(llvm::Value *), *from_real(llvm::Value *);
     };
     class Boolean : public Type {
     public:
         llvm::Type *llvm_type() override;
         std::unique_ptr<Type> clone() override;
-        llvm::Value *require(std::unique_ptr<Type>, llvm::Value *) override;
+        llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *) override;
         llvm::Value *from_boolean(llvm::Value *) override;
     };
     class Integer : public Type {
     public:
         llvm::Type *llvm_type() override;
         std::unique_ptr<Type> clone() override;
-        llvm::Value *require(std::unique_ptr<Type>, llvm::Value *) override;
+        llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *) override;
         llvm::Value *from_integer(llvm::Value *) override;
+        llvm::Constant *default_value() override;
     };
     class Real : public Type {
     public:
         llvm::Type *llvm_type() override;
         std::unique_ptr<Type> clone() override;
-        llvm::Value *require(std::unique_ptr<Type>, llvm::Value *) override;
+        llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *) override;
         llvm::Value *from_real(llvm::Value *) override, *from_integer(llvm::Value *) override;
     };
     class String : public Type {

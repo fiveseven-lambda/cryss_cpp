@@ -11,7 +11,8 @@ namespace value {
         std::unique_ptr<type::Type> type;
     public:
         Value(llvm::Value *, std::unique_ptr<type::Type>);
-        llvm::Value *require(std::unique_ptr<type::Type>);
+        llvm::Value *require(const std::unique_ptr<type::Type> &);
+        std::unique_ptr<type::Type> get_type();
     };
 }
 

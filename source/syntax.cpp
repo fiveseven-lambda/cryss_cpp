@@ -110,18 +110,29 @@ namespace syntax {
         auto function = llvm::Function::Create(function_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, ss.str(), *mod);
         auto basic_block = llvm::BasicBlock::Create(*context.getContext(), "entry", function);
         builder.SetInsertPoint(basic_block);
-        compile(variables, global_variables, range);
+        compile(variables, global_variables, *mod, range);
         mod->print(llvm::errs(), nullptr);
         jit->addIRModule(llvm::orc::ThreadSafeModule(std::move(mod), context));
         auto compiled = reinterpret_cast<int (*)()>(jit->lookup(ss.str()).get().getAddress());
         std::cout << compiled() << std::endl;
     }
-    void ExpressionSentence::compile(Variables &variables, GlobalVariables &global_variables, pos::Range &){
+    void ExpressionSentence::compile(Variables &variables, GlobalVariables &global_variables, llvm::Module &, pos::Range &){
         // ちょっと今だけ関数に値を返させる　あとで消す
-        builder.CreateRet(expression.second->rvalue(variables, expression.first).value);
+        auto value = expression.second->rvalue(variables, expression.first).require(std::make_unique<type::Integer>());
+        if(!value){
+            value = builder.getInt32(-1);
+        }
+        builder.CreateRet(value);
     }
-    void Substitution::compile(Variables &variables, GlobalVariables &, pos::Range &){ }
-    void Declaration::compile(Variables &variables, GlobalVariables &, pos::Range &){ }
+    void Substitution::compile(Variables &variables, GlobalVariables &, llvm::Module &, pos::Range &){ }
+    void Declaration::compile(Variables &variables, GlobalVariables &global_variables, llvm::Module &mod, pos::Range &){
+        auto value = expression.second->rvalue(variables, expression.first);
+        auto type = value.get_type();
+        llvm::Value *ptr = new llvm::GlobalVariable(mod, type->llvm_type(), false, llvm::GlobalValue::CommonLinkage, type->default_value(), name);
+        builder.CreateStore(value.require(type), ptr);
+        builder.CreateRet(builder.getInt32(0));
+        global_variables.emplace(std::move(name), std::move(type));
+    }
 
     // for debug
     constexpr int TAB = 4;

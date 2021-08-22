@@ -130,7 +130,7 @@ namespace syntax {
     class Sentence {
     public:
         virtual ~Sentence();
-        virtual void compile(Variables &, GlobalVariables &, pos::Range &) = 0;
+        virtual void compile(Variables &, GlobalVariables &, llvm::Module &, pos::Range &) = 0;
         void run(GlobalVariables &, pos::Range &, int);
 
         // for debug print
@@ -143,7 +143,7 @@ namespace syntax {
         PairRangeExpression expression;
     public:
         ExpressionSentence(PairRangeExpression);
-        void compile(Variables &, GlobalVariables &, pos::Range &) override;
+        void compile(Variables &, GlobalVariables &, llvm::Module &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -151,7 +151,7 @@ namespace syntax {
         PairRangeExpression left, right;
     public:
         Substitution(PairRangeExpression, PairRangeExpression);
-        void compile(Variables &, GlobalVariables &, pos::Range &) override;
+        void compile(Variables &, GlobalVariables &, llvm::Module &, pos::Range &) override;
         void print(int) override;
     };
 
@@ -160,7 +160,7 @@ namespace syntax {
         PairRangeExpression expression;
     public:
         Declaration(std::string, PairRangeExpression);
-        void compile(Variables &, GlobalVariables &, pos::Range &) override;
+        void compile(Variables &, GlobalVariables &, llvm::Module &, pos::Range &) override;
         void print(int) override;
     };
 }

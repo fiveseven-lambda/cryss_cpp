@@ -36,10 +36,10 @@ namespace type {
         }
         return std::make_unique<Function>(std::move(new_argument_types), result_type->clone());
     }
-    llvm::Value *Type::require(std::unique_ptr<Type>, llvm::Value *){ return nullptr; }
-    llvm::Value *Boolean::require(std::unique_ptr<Type> type, llvm::Value *value){ return type->from_boolean(value); }
-    llvm::Value *Integer::require(std::unique_ptr<Type> type, llvm::Value *value){ return type->from_integer(value); }
-    llvm::Value *Real::require(std::unique_ptr<Type> type, llvm::Value *value){ return type->from_real(value); }
+    llvm::Value *Type::require(const std::unique_ptr<Type> &, llvm::Value *){ return nullptr; }
+    llvm::Value *Boolean::require(const std::unique_ptr<Type> &type, llvm::Value *value){ return type->from_boolean(value); }
+    llvm::Value *Integer::require(const std::unique_ptr<Type> &type, llvm::Value *value){ return type->from_integer(value); }
+    llvm::Value *Real::require(const std::unique_ptr<Type> &type, llvm::Value *value){ return type->from_real(value); }
     llvm::Value *Type::from_boolean(llvm::Value *){ return nullptr; }
     llvm::Value *Boolean::from_boolean(llvm::Value *value){ return value; }
     llvm::Value *Type::from_integer(llvm::Value *){ return nullptr; }
@@ -47,4 +47,13 @@ namespace type {
     llvm::Value *Real::from_integer(llvm::Value *value){ return builder.CreateSIToFP(value, real_type); }
     llvm::Value *Type::from_real(llvm::Value *){ return nullptr; }
     llvm::Value *Real::from_real(llvm::Value *value){ return value; }
+
+    llvm::Constant *Type::default_value(){
+        // この関数は消す
+        // いずれ純粋仮想関数に
+        return llvm::ConstantInt::get(integer_type, 0);
+    }
+    llvm::Constant *Integer::default_value(){
+        return llvm::ConstantInt::get(integer_type, 0);
+    }
 }
