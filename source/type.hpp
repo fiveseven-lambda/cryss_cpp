@@ -63,9 +63,9 @@ namespace type {
         const Type &return_type;
     public:
         Function(const Tuple &, const Type &);
-        const Tuple &get_arguments_type() const;
+        const std::vector<std::reference_wrapper<const Type>> &get_arguments_type() const;
         const Type &get_return_type() const;
-        std::pair<const Tuple &, const Type &> into_pair() const;
+        std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> into_pair() const;
         virtual void debug_print(int) const override;
     };
 
@@ -93,13 +93,13 @@ namespace type {
     };
     struct FunctionHash {
         using is_transparent = void;
-        std::size_t operator()(const std::pair<const Tuple &, const Type &> &) const noexcept;
+        std::size_t operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &) const noexcept;
         std::size_t operator()(const std::unique_ptr<Function> &) const noexcept;
     };
     struct FunctionEq {
         using is_transparent = void;
-        bool operator()(const std::pair<const Tuple &, const Type &> &, const std::pair<const Tuple &, const Type &> &) const noexcept;
-        bool operator()(const std::pair<const Tuple &, const Type &> &, const std::unique_ptr<Function> &) const noexcept;
+        bool operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &, const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &) const noexcept;
+        bool operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &, const std::unique_ptr<Function> &) const noexcept;
         bool operator()(const std::unique_ptr<Function> &, const std::unique_ptr<Function> &) const noexcept;
     };
 
@@ -113,7 +113,7 @@ namespace type {
     public:
         const Primitive &primitive(PrimitiveKind);
         const Tuple &tuple(const std::vector<std::reference_wrapper<const Type>> &);
-        const Function &function(const Tuple &, const Type &);
+        const Function &function(const std::vector<std::reference_wrapper<const Type>> &, const Type &);
         /**
          * @todo デバッグ出力
          */
