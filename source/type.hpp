@@ -26,7 +26,7 @@ namespace type {
     /**
      * @brief プリミティブ型の種類を表す
      */
-    enum class PrimitiveTypeKind {
+    enum class PrimitiveKind {
         Boolean,
         Integer,
         Rational,
@@ -36,11 +36,11 @@ namespace type {
     /**
      * @brief プリミティブ型
      */
-    class PrimitiveType : public Type {
-        PrimitiveTypeKind kind;
+    class Primitive : public Type {
+        PrimitiveKind kind;
     public:
-        PrimitiveType(PrimitiveTypeKind);
-        PrimitiveTypeKind get_kind() const;
+        Primitive(PrimitiveKind);
+        PrimitiveKind get_kind() const;
         virtual void debug_print(int) const override;
     };
 
@@ -55,16 +55,30 @@ namespace type {
         virtual void debug_print(int) const override;
     };
 
-    struct PrimitiveTypeHash {
-        using is_transparent = void;
-        std::size_t operator()(const PrimitiveTypeKind &) const noexcept;
-        std::size_t operator()(const std::unique_ptr<PrimitiveType> &) const noexcept;
+    /**
+     * @brief 関数型
+     */
+    class Function : public Type {
+        const Tuple &arguments_type;
+        const Type &return_type;
+    public:
+        Function(const Tuple &, const Type &);
+        const Tuple &get_arguments_type() const;
+        const Type &get_return_type() const;
+        std::pair<const Tuple &, const Type &> into_pair() const;
+        virtual void debug_print(int) const override;
     };
-    struct PrimitiveTypeEq {
+
+    struct PrimitiveHash {
         using is_transparent = void;
-        bool operator()(const PrimitiveTypeKind &, const PrimitiveTypeKind &) const noexcept;
-        bool operator()(const PrimitiveTypeKind &, const std::unique_ptr<PrimitiveType> &) const noexcept;
-        bool operator()(const std::unique_ptr<PrimitiveType> &, const std::unique_ptr<PrimitiveType> &) const noexcept;
+        std::size_t operator()(const PrimitiveKind &) const noexcept;
+        std::size_t operator()(const std::unique_ptr<Primitive> &) const noexcept;
+    };
+    struct PrimitiveEq {
+        using is_transparent = void;
+        bool operator()(const PrimitiveKind &, const PrimitiveKind &) const noexcept;
+        bool operator()(const PrimitiveKind &, const std::unique_ptr<Primitive> &) const noexcept;
+        bool operator()(const std::unique_ptr<Primitive> &, const std::unique_ptr<Primitive> &) const noexcept;
     };
     struct TupleHash {
         using is_transparent = void;
@@ -77,16 +91,29 @@ namespace type {
         bool operator()(const std::vector<std::reference_wrapper<const Type>> &, const std::unique_ptr<Tuple> &) const noexcept;
         bool operator()(const std::unique_ptr<Tuple> &, const std::unique_ptr<Tuple> &) const noexcept;
     };
+    struct FunctionHash {
+        using is_transparent = void;
+        std::size_t operator()(const std::pair<const Tuple &, const Type &> &) const noexcept;
+        std::size_t operator()(const std::unique_ptr<Function> &) const noexcept;
+    };
+    struct FunctionEq {
+        using is_transparent = void;
+        bool operator()(const std::pair<const Tuple &, const Type &> &, const std::pair<const Tuple &, const Type &> &) const noexcept;
+        bool operator()(const std::pair<const Tuple &, const Type &> &, const std::unique_ptr<Function> &) const noexcept;
+        bool operator()(const std::unique_ptr<Function> &, const std::unique_ptr<Function> &) const noexcept;
+    };
 
     /**
      * @brief 型を管理する．
      */
     class TypeContext {
-        std::unordered_set<std::unique_ptr<PrimitiveType>, PrimitiveTypeHash, PrimitiveTypeEq> primitive_types;
+        std::unordered_set<std::unique_ptr<Primitive>, PrimitiveHash, PrimitiveEq> primitives;
         std::unordered_set<std::unique_ptr<Tuple>, TupleHash, TupleEq> tuples;
+        std::unordered_set<std::unique_ptr<Function>, FunctionHash, FunctionEq> functions;
     public:
-        const PrimitiveType &primitive_type(PrimitiveTypeKind);
+        const Primitive &primitive(PrimitiveKind);
         const Tuple &tuple(const std::vector<std::reference_wrapper<const Type>> &);
+        const Function &function(const Tuple &, const Type &);
         /**
          * @todo デバッグ出力
          */
