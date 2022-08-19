@@ -1,78 +1,90 @@
+/**
+ * @file type.hpp
+ */
 #ifndef TYPE_HPP
 #define TYPE_HPP
 
 #include <vector>
 #include <memory>
-#include <string>
+#include <functional>
+#include <unordered_set>
 
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
-
+/**
+ * @brief 型を定義する．
+ */
 namespace type {
+    /**
+     * @brief 全ての型の基底クラス
+     */
     class Type {
     public:
-        virtual llvm::Type *llvm_type() = 0;
         virtual ~Type();
-        virtual std::unique_ptr<Type> clone() = 0;
-        virtual llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *);
-        virtual llvm::Constant *default_value();
-        virtual llvm::Value *from_boolean(llvm::Value *), *from_integer(llvm::Value *), *from_real(llvm::Value *);
+        /// @todo debug用出力の削除
+        virtual void debug_print(int) const = 0;
     };
-    class Boolean : public Type {
-    public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
-        llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *) override;
-        llvm::Value *from_boolean(llvm::Value *) override;
+
+    /**
+     * @brief プリミティブ型の種類を表す
+     */
+    enum class PrimitiveTypeKind {
+        Boolean,
+        Integer,
+        Rational,
+        Float,
     };
-    class Integer : public Type {
+
+    /**
+     * @brief プリミティブ型
+     */
+    class PrimitiveType : public Type {
+        PrimitiveTypeKind kind;
     public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
-        llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *) override;
-        llvm::Value *from_integer(llvm::Value *) override;
-        llvm::Constant *default_value() override;
+        PrimitiveType(PrimitiveTypeKind);
+        PrimitiveTypeKind get_kind() const;
+        virtual void debug_print(int) const override;
     };
-    class Real : public Type {
+
+    /**
+     * @brief タプル
+     */
+    class Tuple : public Type {
+        const std::vector<std::reference_wrapper<Type>> elements_type;
     public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
-        llvm::Value *require(const std::unique_ptr<Type> &, llvm::Value *) override;
-        llvm::Value *from_real(llvm::Value *) override, *from_integer(llvm::Value *) override;
+        Tuple(const std::vector<std::reference_wrapper<Type>> &);
+        const std::vector<std::reference_wrapper<Type>> &get_elements_type() const;
+        virtual void debug_print(int) const override;
     };
-    class String : public Type {
-    public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
+
+    struct PrimitiveTypeHash {
+        using is_transparent = void;
+        std::size_t operator()(const PrimitiveTypeKind &) const noexcept;
+        std::size_t operator()(const std::unique_ptr<PrimitiveType> &) const noexcept;
     };
-    class Sound : public Type {
-        std::unique_ptr<Type> element_type;
-    public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
-        Sound(std::unique_ptr<Type>);
+    struct PrimitiveTypePred {
+        using is_transparent = void;
+        bool operator()(const PrimitiveTypeKind &, const PrimitiveTypeKind &) const noexcept;
+        bool operator()(const PrimitiveTypeKind &, const std::unique_ptr<PrimitiveType> &) const noexcept;
     };
-    class Iter : public Type {
-        std::unique_ptr<Type> element_type;
-    public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
-        Iter(std::unique_ptr<Type>);
+    struct TupleHash {
+        using is_transparent = void;
+        std::size_t operator()(const std::vector<std::reference_wrapper<Type>> &) const noexcept;
+        std::size_t operator()(const std::unique_ptr<Tuple> &) const noexcept;
     };
-    class Array : public Type {
-        std::unique_ptr<Type> element_type;
-    public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> clone() override;
-        Array(std::unique_ptr<Type>);
+    struct TuplePred {
+        using is_transparent = void;
+        bool operator()(const std::vector<std::reference_wrapper<Type>> &, const std::vector<std::reference_wrapper<Type>> &) const noexcept;
+        bool operator()(const std::vector<std::reference_wrapper<Type>> &, const std::unique_ptr<Tuple> &) const noexcept;
     };
-    class Function : public Type {
-        std::vector<std::unique_ptr<Type>> argument_types;
+
+    /**
+     * @brief 型を管理する．
+     */
+    class TypeContext {
+        std::unordered_set<std::unique_ptr<PrimitiveType>, PrimitiveTypeHash, PrimitiveTypeKind> primitive_types;
+        std::unordered_set<std::unique_ptr<Tuple>, TupleHash, TuplePred> tuples;
     public:
-        llvm::Type *llvm_type() override;
-        std::unique_ptr<Type> result_type;
-        std::unique_ptr<Type> clone() override;
-        Function(std::vector<std::unique_ptr<Type>>, std::unique_ptr<Type>);
+        const PrimitiveType &primitive_type(PrimitiveTypeKind kind);
+        const Tuple &tuple();
     };
 }
 

@@ -1,59 +1,58 @@
-
+/**
+ * @file type.cpp
+ */
 #include "type.hpp"
-#include "context.hpp"
-#include "llvm/IR/LLVMContext.h"
+
+#include <boost/functional/hash.hpp>
+
+/// @todo デバッグ出力用
+#include <iostream>
 
 namespace type {
     Type::~Type() = default;
-    Sound::Sound(std::unique_ptr<Type> element_type):
-        element_type(std::move(element_type)) {}
-    Iter::Iter(std::unique_ptr<Type> element_type):
-        element_type(std::move(element_type)) {}
-    Array::Array(std::unique_ptr<Type> element_type):
-        element_type(std::move(element_type)) {}
-    Function::Function(std::vector<std::unique_ptr<Type>> argument_types, std::unique_ptr<Type> result_type):
-        argument_types(std::move(argument_types)),
-        result_type(std::move(result_type)) {}
-    llvm::Type *Boolean::llvm_type(){ return boolean_type; }
-    llvm::Type *Integer::llvm_type(){ return integer_type; }
-    llvm::Type *Real::llvm_type(){ return real_type; }
-    llvm::Type *String::llvm_type(){ /* todo */ }
-    llvm::Type *Sound::llvm_type(){ /* todo */ }
-    llvm::Type *Iter::llvm_type(){ /* todo */ }
-    llvm::Type *Array::llvm_type(){ /* todo */ }
-    llvm::Type *Function::llvm_type(){ /* todo */ }
-    std::unique_ptr<Type> Boolean::clone(){ return std::make_unique<Boolean>(); }
-    std::unique_ptr<Type> Integer::clone(){ return std::make_unique<Integer>(); }
-    std::unique_ptr<Type> Real::clone(){ return std::make_unique<Real>(); }
-    std::unique_ptr<Type> String::clone(){ return std::make_unique<String>(); }
-    std::unique_ptr<Type> Sound::clone(){ return std::make_unique<Sound>(element_type->clone()); }
-    std::unique_ptr<Type> Iter::clone(){ return std::make_unique<Iter>(element_type->clone()); }
-    std::unique_ptr<Type> Array::clone(){ return std::make_unique<Array>(element_type->clone()); }
-    std::unique_ptr<Type> Function::clone(){
-        std::vector<std::unique_ptr<Type>> new_argument_types(argument_types.size());
-        for(std::size_t i = 0; i < argument_types.size(); ++i){
-            new_argument_types[i] = argument_types[i]->clone();
-        }
-        return std::make_unique<Function>(std::move(new_argument_types), result_type->clone());
-    }
-    llvm::Value *Type::require(const std::unique_ptr<Type> &, llvm::Value *){ return nullptr; }
-    llvm::Value *Boolean::require(const std::unique_ptr<Type> &type, llvm::Value *value){ return type->from_boolean(value); }
-    llvm::Value *Integer::require(const std::unique_ptr<Type> &type, llvm::Value *value){ return type->from_integer(value); }
-    llvm::Value *Real::require(const std::unique_ptr<Type> &type, llvm::Value *value){ return type->from_real(value); }
-    llvm::Value *Type::from_boolean(llvm::Value *){ return nullptr; }
-    llvm::Value *Boolean::from_boolean(llvm::Value *value){ return value; }
-    llvm::Value *Type::from_integer(llvm::Value *){ return nullptr; }
-    llvm::Value *Integer::from_integer(llvm::Value *value){ return value; }
-    llvm::Value *Real::from_integer(llvm::Value *value){ return builder.CreateSIToFP(value, real_type); }
-    llvm::Value *Type::from_real(llvm::Value *){ return nullptr; }
-    llvm::Value *Real::from_real(llvm::Value *value){ return value; }
+    PrimitiveType::PrimitiveType(PrimitiveTypeKind kind): kind(kind) {}
+    Tuple::Tuple(const std::vector<std::reference_wrapper<Type>> &elements_type): elements_type(elements_type) {}
 
-    llvm::Constant *Type::default_value(){
-        // この関数は消す
-        // いずれ純粋仮想関数に
-        return llvm::ConstantInt::get(integer_type, 0);
+    PrimitiveTypeKind PrimitiveType::get_kind() const { return kind; }
+    const std::vector<std::reference_wrapper<Type>> &Tuple::get_elements_type() const { return elements_type; }
+
+    std::size_t PrimitiveTypeHash::operator()(const PrimitiveTypeKind &kind) const noexcept { return std::hash<PrimitiveTypeKind>()(kind); }
+    std::size_t PrimitiveTypeHash::operator()(const std::unique_ptr<PrimitiveType> &type) const noexcept { return (*this)(type->get_kind()); }
+    bool PrimitiveTypePred::operator()(const PrimitiveTypeKind &left, const PrimitiveTypeKind &right) const noexcept { return left == right; }
+    bool PrimitiveTypePred::operator()(const PrimitiveTypeKind &left, const std::unique_ptr<PrimitiveType> &right) const noexcept { return left == right->get_kind(); }
+
+    std::size_t TupleHash::operator()(const std::vector<std::reference_wrapper<Type>> &elements_type) const noexcept {
+        std::size_t seed = 0;
+        // 注意：Type * 型のアドレス値を使う
+        for(Type &element_type : elements_type) boost::hash_combine<Type *>(seed, &element_type);
+        return seed;
     }
-    llvm::Constant *Integer::default_value(){
-        return llvm::ConstantInt::get(integer_type, 0);
+    std::size_t TupleHash::operator()(const std::unique_ptr<Tuple> &type) const noexcept { return (*this)(type->get_elements_type()); }
+
+    const PrimitiveType &TypeContext::primitive_type(PrimitiveTypeKind kind){
+        auto it = primitive_types.find<PrimitiveTypeKind>(kind);
+    }
+
+    /// @todo デバッグ出力用
+    static void indent(int depth){
+        for(int i = 0; i < depth; i++) std::cout << "    ";
+    }
+    void PrimitiveType::debug_print(int depth) const {
+        indent(depth);
+        std::string_view name;
+        switch(kind){
+            case PrimitiveTypeKind::Boolean: name = "boolean"; break;
+            case PrimitiveTypeKind::Integer: name = "integer"; break;
+            case PrimitiveTypeKind::Rational: name = "rational"; break;
+            case PrimitiveTypeKind::Float: name = "float";
+        }
+        std::cout << name << std::endl;
+    }
+    void Tuple::debug_print(int depth) const {
+        indent(depth);
+        std::cout << "tuple" << std::endl;
+        for(Type &element_type : elements_type){
+            element_type.debug_print(depth);
+        }
     }
 }

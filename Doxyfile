@@ -1,0 +1,5 @@
+PROJECT_NAME = "cryss (C++)"
+INPUT = "source/"
+GENERATE_LATEX = NO
+HAVE_DOT = YES
+EXTRACT_STATIC = YES
