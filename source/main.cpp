@@ -2,6 +2,7 @@
  * @file main.cpp
  */
 #include "type.hpp"
+#include "lexer.hpp"
 
 #include <functional>
 #include <iostream>

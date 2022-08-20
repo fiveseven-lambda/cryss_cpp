@@ -5,26 +5,41 @@
 #define POS_HPP
 
 #include <cstddef>
-#include <optional>
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <string>
 
 namespace pos {
-    class Start {
-        std::size_t line, byte;
-    public:
-        Start(std::size_t, std::size_t);
-    };
-    class End {
+    //! ソースコード上の文字の位置
+    class Pos {
         std::size_t line;
-        std::optional<std::size_t> byte;
+        std::size_t byte;
     public:
-        End(std::size_t, std::optional<std::size_t>);
+        Pos();
+        Pos(std::size_t, std::size_t);
+        std::pair<std::size_t, std::size_t> into_pair() const;
+        friend std::ostream &operator<<(std::ostream &, const Pos &);
+        void eprint(const std::vector<std::string> &) const;
     };
+
+    //! ソースコード上の式や文の範囲
     class Range {
-        Start start;
-        End end;
+        Pos start;
+        Pos end;
     public:
-        Range(Start, End);
-        Range(std::size_t, std::size_t, std::optional<std::size_t>);
+        Range();
+        Range(std::size_t, std::size_t, std::size_t);
+        Range(Pos, Pos);
+        Range(const Range &) = delete;
+        Range &operator=(const Range &) = delete;
+        Range(Range &&);
+        Range &operator=(Range &&);
+        Range &operator+=(const Range &);
+        friend Range operator+(const Range &, const Range &);
+        Range clone();
+        friend std::ostream &operator<<(std::ostream &, const Range &);
+        void eprint(const std::vector<std::string> &) const;
     };
 }
 
