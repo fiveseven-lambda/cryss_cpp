@@ -19,8 +19,9 @@ namespace type {
     class Type {
     public:
         virtual ~Type();
-        /// @todo debug用出力の削除
+#ifdef DEBUG
         virtual void debug_print(int) const = 0;
+#endif
     };
 
     /**
@@ -41,7 +42,9 @@ namespace type {
     public:
         Primitive(PrimitiveKind);
         PrimitiveKind get_kind() const;
+#ifdef DEBUG
         virtual void debug_print(int) const override;
+#endif
     };
 
     /**
@@ -52,7 +55,9 @@ namespace type {
     public:
         Tuple(const std::vector<std::reference_wrapper<const Type>> &);
         const std::vector<std::reference_wrapper<const Type>> &get_elements_type() const;
+#ifdef DEBUG
         virtual void debug_print(int) const override;
+#endif
     };
 
     /**
@@ -66,7 +71,9 @@ namespace type {
         const std::vector<std::reference_wrapper<const Type>> &get_arguments_type() const;
         const Type &get_return_type() const;
         std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> into_pair() const;
+#ifdef DEBUG
         virtual void debug_print(int) const override;
+#endif
     };
 
     /**
@@ -143,10 +150,9 @@ namespace type {
          * @brief 関数型を得る．
          */
         const Function &function(const std::vector<std::reference_wrapper<const Type>> &, const Type &);
-        /**
-         * @todo デバッグ出力
-         */
+#ifdef DEBUG
         void debug_print(int) const;
+#endif
     };
 }
 

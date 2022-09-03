@@ -1,5 +1,6 @@
 CXX=clang++
 CXXFLAGS=-std=c++20 \
+	-DDEBUG \
 	-D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STC_FORMAT_MACROS -D__STDC_LIMIT_MACROS \
 	-Weverything -Wno-shadow-field-in-constructor -Wno-padded -Wno-c++98-compat -Wno-c++98-compat-pedantic
 LDFLAGS=-lLLVM

@@ -3,11 +3,27 @@
  */
 #include "type.hpp"
 #include "lexer.hpp"
+#include "error.hpp"
 
 #include <functional>
 #include <iostream>
 
 int main() {
+    lexer::Lexer lexer;
+    try {
+        while(true){
+            auto token = lexer.next();
+            if(!token){
+                break;
+            }
+            token->debug_print(0);
+        }
+    }catch(std::unique_ptr<error::Error> &error){
+        error->eprint(lexer.get_log());
+    }
+    return 0;
+
+    /*
     // グローバルな変数リスト：string → (const Type &, bool)
     // ローカルな変数リスト：string → vector<(Type &, llvm::Value *, bool)>
     // 
@@ -28,4 +44,5 @@ int main() {
         type_context.function({get_integer()}, get_integer())
     );
     type_context.debug_print(0);
+    */
 }

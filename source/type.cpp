@@ -5,9 +5,6 @@
 
 #include <boost/functional/hash.hpp>
 
-/// @todo デバッグ出力用
-#include <iostream>
-
 namespace type {
     Type::~Type() = default;
     Primitive::Primitive(PrimitiveKind kind): kind(kind) {}
@@ -70,11 +67,14 @@ namespace type {
         if(it == functions.end()) it = functions.insert(std::make_unique<Function>(tuple(arguments_type), return_type)).first;
         return **it;
     }
+}
 
-    /// @todo デバッグ出力用
-    static void indent(int depth){
-        for(int i = 0; i < depth; i++) std::cout << "    ";
-    }
+#ifdef DEBUG
+#include <iostream>
+static void indent(int depth){
+    for(int i = 0; i < depth; i++) std::cout << "    ";
+}
+namespace type {
     void Primitive::debug_print(int depth) const {
         indent(depth);
         std::string_view name;
@@ -109,3 +109,4 @@ namespace type {
         for(auto &type : functions) type->debug_print(depth);
     }
 }
+#endif

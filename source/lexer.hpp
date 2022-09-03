@@ -10,12 +10,14 @@
 #include <queue>
 #include <istream>
 #include <memory>
+#include <optional>
 
 #include "token.hpp"
 
 namespace lexer {
     class LineLexer {
         std::vector<pos::Pos> comments;
+        std::optional<std::pair<pos::Pos, std::string>> string;
     public:
         void run(
             std::size_t,
