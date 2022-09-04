@@ -35,8 +35,7 @@ namespace lexer {
         std::queue<std::unique_ptr<token::Token>> tokens;
         LineLexer line_lexer;
     public:
-        Lexer();
-        Lexer(std::istream &);
+        Lexer(std::istream &, bool);
         void beginning_of_sentence();
         const std::vector<std::string> &get_log() const;
         std::unique_ptr<token::Token> next(), &peek();

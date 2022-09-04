@@ -36,23 +36,12 @@ namespace token {
 #endif
     };
     /**
-     * @brief 整数リテラル `[0-9]+`
+     * @brief 数値リテラル
      */
-    class Integer : public Token {
+    class Number : public Token {
         std::string_view value;
     public:
-        Integer(std::string_view);
-#ifdef DEBUG
-        virtual void debug_print(int) const override;
-#endif
-    };
-    /**
-     * @brief 小数リテラル
-     */
-    class Decimal : public Token {
-        std::string_view value;
-    public:
-        Decimal(std::string_view);
+        Number(std::string_view);
 #ifdef DEBUG
         virtual void debug_print(int) const override;
 #endif

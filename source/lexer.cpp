@@ -8,22 +8,12 @@
 
 namespace lexer {
     /**
-     * @brief 標準入力から読む．
-     *
-     * 1行読むたびに，プロンプトを出力する．
+     * @brief コンストラクタ．
      */
-    Lexer::Lexer():
-        source(std::cin),
-        prompt(true),
-        is_beginning_of_sentence(true) {}
-    /**
-     * @brief 指定された `std::istream` から読む．
-     *
-     * プロンプトは出力しない．
-     */
-    Lexer::Lexer(std::istream &source):
+    Lexer::Lexer(std::istream &source, bool prompt):
         source(source),
-        prompt(false) {}
+        prompt(prompt),
+        is_beginning_of_sentence(true) {}
 
     void Lexer::beginning_of_sentence(){
         is_beginning_of_sentence = true;
@@ -137,11 +127,54 @@ namespace lexer {
             }
             std::size_t start = cursor;
             std::unique_ptr<token::Token> token;
-            if(std::isdigit(line[start])){
-                while(std::isdigit(line[cursor])) cursor++;
-                token = std::make_unique<token::Integer>(line.substr(start, cursor - start));
+            if(std::isdigit(line[start]) || line[start] == '.'){
+                enum class State {
+                    Dot,
+                    Decimal,
+                    Number,
+                    Scientific,
+                };
+                State state = line[start] == '.' ? State::Dot : State::Decimal;
+                for(cursor++; cursor < line.size(); cursor++){
+                    switch(state){
+                        case State::Dot:
+                            if(std::isdigit(line[cursor])){
+                                state = State::Decimal;
+                                continue;
+                            }
+                            break;
+                        case State::Decimal:
+                            if(line[cursor] == 'e'){
+                                state = State::Scientific;
+                                continue;
+                            }else if(std::isdigit(line[cursor]) || line[cursor] == '.'){
+                                continue;
+                            }else if(std::isalpha(line[cursor])){
+                                state = State::Number;
+                                continue;
+                            }
+                            break;
+                        case State::Scientific:
+                            if(std::isalnum(line[cursor]) || line[cursor] == '+' || line[cursor] == '-'){
+                                state = State::Number;
+                                continue;
+                            }
+                            break;
+                        case State::Number:
+                            if(std::isalnum(line[cursor])){
+                                continue;
+                            }
+                    }
+                    break;
+                }
+                if(state == State::Dot){
+                    token = std::make_unique<token::Dot>();
+                }else{
+                    token = std::make_unique<token::Number>(line.substr(start, cursor - start));
+                }
             }else if(std::isalpha(line[start]) || line[start] == '_' || line[start] == '$'){
-                while(std::isalnum(line[cursor]) || line[cursor] == '_' || line[cursor] == '$') cursor++;
+                do cursor++;
+                while(cursor < line.size() && (std::isalnum(line[cursor]) || line[cursor] == '_' || line[cursor] == '$'));
                 token = std::make_unique<token::Identifier>(line.substr(start, cursor - start));
             }else if(advance_if('+')){
                 if(advance_if('+')) token = std::make_unique<token::DoublePlus>();

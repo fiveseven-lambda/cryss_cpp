@@ -34,8 +34,7 @@ namespace error {
     }
 
     /**
-     * @brief 字句解析中に予期せぬ文字が現れた．
-     * `Lexer::peek()`，`Lexer::next()`
+     * @brief Lexer：予期せぬ文字が現れた．
      *
      * 空白とコメント以外に，トークンの始まりとして適さない文字があった．
      */
@@ -47,8 +46,7 @@ namespace error {
     };
 
     /**
-     * @brief コメントが終了しなかった．
-     * `Lexer::peek()`，`Lexer::next()`
+     * @brief Lexer：コメントが終了しなかった．
      *
      * コメントの途中で EOF に達した．
      */
@@ -59,6 +57,11 @@ namespace error {
         void eprint(const std::vector<std::string> &) const override;
     };
 
+    /**
+     * @brief Lexer：文字列リテラル中に無効なエスケープシーケンスがあった．
+     *
+     * 行が `\` で終了した．
+     */
     class InvalidEscape : public Error {
         pos::Pos pos;
     public:

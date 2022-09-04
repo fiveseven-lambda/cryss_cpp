@@ -6,8 +6,7 @@
 namespace token {
     Token::~Token() = default;
     Identifier::Identifier(std::string_view name): name(name) {}
-    Integer::Integer(std::string_view value): value(value) {}
-    Decimal::Decimal(std::string_view value): value(value) {}
+    Number::Number(std::string_view value): value(value) {}
     String::String(std::string value) : value(std::move(value)) {}
 
 }
@@ -22,13 +21,9 @@ namespace token {
         indent(depth);
         std::cout << "identifier (" << name << ")" << std::endl;
     }
-    void Integer::debug_print(int depth) const {
+    void Number::debug_print(int depth) const {
         indent(depth);
         std::cout << "integer (" << value << ")" << std::endl;
-    }
-    void Decimal::debug_print(int depth) const {
-        indent(depth);
-        std::cout << "decimal (" << value << ")" << std::endl;
     }
     void String::debug_print(int depth) const {
         indent(depth);

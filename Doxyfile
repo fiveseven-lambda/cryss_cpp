@@ -1,4 +1,4 @@
-PROJECT_NAME = "cryss (C++)"
+PROJECT_NAME = "Cryss (C++)"
 INPUT = "source/"
 GENERATE_LATEX = NO
 HAVE_DOT = YES
