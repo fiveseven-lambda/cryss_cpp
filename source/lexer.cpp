@@ -127,51 +127,22 @@ namespace lexer {
             }
             std::size_t start = cursor;
             std::unique_ptr<token::Token> token;
-            if(std::isdigit(line[start]) || line[start] == '.'){
-                enum class State {
-                    Dot,
-                    Decimal,
-                    Number,
-                    Scientific,
-                };
-                State state = line[start] == '.' ? State::Dot : State::Decimal;
-                for(cursor++; cursor < line.size(); cursor++){
-                    switch(state){
-                        case State::Dot:
-                            if(std::isdigit(line[cursor])){
-                                state = State::Decimal;
-                                continue;
-                            }
-                            break;
-                        case State::Decimal:
-                            if(line[cursor] == 'e'){
-                                state = State::Scientific;
-                                continue;
-                            }else if(std::isdigit(line[cursor]) || line[cursor] == '.'){
-                                continue;
-                            }else if(std::isalpha(line[cursor])){
-                                state = State::Number;
-                                continue;
-                            }
-                            break;
-                        case State::Scientific:
-                            if(std::isalnum(line[cursor]) || line[cursor] == '+' || line[cursor] == '-'){
-                                state = State::Number;
-                                continue;
-                            }
-                            break;
-                        case State::Number:
-                            if(std::isalnum(line[cursor])){
-                                continue;
-                            }
-                    }
-                    break;
-                }
-                if(state == State::Dot){
-                    token = std::make_unique<token::Dot>();
-                }else{
-                    token = std::make_unique<token::Number>(line.substr(start, cursor - start));
-                }
+            auto parse_number = [&]{
+                do cursor++;
+                while(
+                    cursor < line.size() && (
+                        std::isalnum(line[cursor])
+                        || line[cursor] == '.'
+                        || (line[cursor - 1] == 'e' && (line[cursor] == '+' || line[cursor] == '-'))
+                    )
+                );
+                token = std::make_unique<token::Number>(line.substr(start, cursor - start));
+            };
+            if(std::isdigit(line[start])){
+                parse_number();
+            }else if(advance_if('.')){
+                if(cursor < line.size() && std::isdigit(line[cursor])) parse_number();
+                else token = std::make_unique<token::Dot>();
             }else if(std::isalpha(line[start]) || line[start] == '_' || line[start] == '$'){
                 do cursor++;
                 while(cursor < line.size() && (std::isalnum(line[cursor]) || line[cursor] == '_' || line[cursor] == '$'));

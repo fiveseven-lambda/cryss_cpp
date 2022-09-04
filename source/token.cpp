@@ -23,7 +23,7 @@ namespace token {
     }
     void Number::debug_print(int depth) const {
         indent(depth);
-        std::cout << "integer (" << value << ")" << std::endl;
+        std::cout << "number (" << value << ")" << std::endl;
     }
     void String::debug_print(int depth) const {
         indent(depth);

@@ -18,9 +18,9 @@ namespace pre_expr {
         indent(depth);
         std::cout << "identifier (" << name << ")" << std::endl;
     }
-    void Integer::debug_print(int depth) const {
+    void Number::debug_print(int depth) const {
         indent(depth);
-        std::cout << "integer (" << value << ")" << std::endl;
+        std::cout << "number (" << value << ")" << std::endl;
     }
     void UnaryOperation::debug_print(int depth) const {
         std::string_view name;

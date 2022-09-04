@@ -30,18 +30,9 @@ namespace pre_expr {
 #endif
     };
     /**
-     * @brief 単一の整数リテラルからなる式
+     * @brief 単一の数値リテラルからなる式
      */
-    class Integer : public Expr {
-        std::string_view value;
-#ifdef DEBUG
-        void debug_print(int) const override;
-#endif
-    };
-    /**
-     * @brief 単一の小数リテラルからなる式
-     */
-    class Decimal : public Expr {
+    class Number : public Expr {
         std::string_view value;
 #ifdef DEBUG
         void debug_print(int) const override;
