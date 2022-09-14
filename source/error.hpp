@@ -57,15 +57,64 @@ namespace error {
     };
 
     /**
-     * @brief Lexer：文字列リリテラが終了しないまま EOF に達した．
+     * @brief Lexer：文字列リテラルが終了しないまま EOF に達した．
      */
     class UnterminatedStringLiteral : public Error {
         pos::Pos pos;
     public:
-        UnterminatedStringLiteral(pos::Pos pos);
+        UnterminatedStringLiteral(pos::Pos);
         void eprint(const std::vector<std::string> &) const override;
     };
 
+    /**
+     * @brief parser：前置演算子の後に予期せぬトークンがあった．
+     */
+    class UnexpectedTokenAfterPrefix : public Error {
+        pos::Range prefix, token;
+    public:
+        UnexpectedTokenAfterPrefix(pos::Range, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    /**
+     * @brief parser：前置演算子の後に EOF があった．
+     */
+    class EOFAfterPrefix : public Error {
+        pos::Range prefix;
+    public:
+        EOFAfterPrefix(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    /**
+     * @brief parser：開き丸括弧に対応する閉じ丸括弧が無いまま EOF に達した．
+     */
+    class NoClosingParenthesis : public Error {
+        pos::Range open;
+    public:
+        NoClosingParenthesis(pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    /**
+     * @brief parser：丸括弧の中に予期せぬトークンがあった．
+     */
+    class UnexpectedTokenInParenthesis : public Error {
+        pos::Range open, token;
+    public:
+        UnexpectedTokenInParenthesis(pos::Range, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
+
+    /**
+     * @brief parser：中身が空の丸括弧があった
+     */
+    class EmptyParenthesis: public Error {
+        pos::Range open, close;
+    public:
+        EmptyParenthesis(pos::Range, pos::Range);
+        void eprint(const std::vector<std::string> &) const override;
+    };
 }
 
 #endif

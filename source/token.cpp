@@ -9,18 +9,10 @@ namespace token {
     Number::Number(std::string_view value): value(value) {}
     String::String(std::string value) : value(std::move(value)) {}
 
-    std::unique_ptr<ast::Expr> Token::factor(){
-        return nullptr;
-    }
-    std::unique_ptr<ast::Expr> Identifier::factor(){
-        return std::make_unique<ast::Identifier>(name);
-    }
-    std::unique_ptr<ast::Expr> Number::factor(){
-        return std::make_unique<ast::Number>(value);
-    }
-    std::unique_ptr<ast::Expr> String::factor(){
-        return std::make_unique<ast::String>(std::move(value));
-    }
+    std::unique_ptr<ast::Expr> Token::factor(){ return nullptr; }
+    std::unique_ptr<ast::Expr> Identifier::factor(){ return std::make_unique<ast::Identifier>(name); }
+    std::unique_ptr<ast::Expr> Number::factor(){ return std::make_unique<ast::Number>(value); }
+    std::unique_ptr<ast::Expr> String::factor(){ return std::make_unique<ast::String>(std::move(value)); }
 
     std::optional<ast::UnaryOperator> Token::prefix(){ return std::nullopt; }
     std::optional<ast::UnaryOperator> Plus::prefix(){ return ast::UnaryOperator::Plus; }
@@ -69,6 +61,19 @@ namespace token {
     std::optional<ast::BinaryOperator> DoubleLessEqual::infix(){ return ast::BinaryOperator::LeftShiftAssign; }
     std::optional<ast::BinaryOperator> TripleGreaterEqual::infix(){ return ast::BinaryOperator::ForwardShiftAssign; }
     std::optional<ast::BinaryOperator> TripleLessEqual::infix(){ return ast::BinaryOperator::BackwardShiftAssign; }
+
+    bool Token::is_opening_parenthesis() const { return false; }
+    bool OpeningParenthesis::is_opening_parenthesis() const { return true; }
+    bool Token::is_closing_parenthesis() const { return false; }
+    bool ClosingParenthesis::is_closing_parenthesis() const { return true; }
+    bool Token::is_opening_bracket() const { return false; }
+    bool OpeningBracket::is_opening_bracket() const { return true; }
+    bool Token::is_closing_bracket() const { return false; }
+    bool ClosingBracket::is_closing_bracket() const { return true; }
+    bool Token::is_opening_brace() const { return false; }
+    bool OpeningBrace::is_opening_brace() const { return true; }
+    bool Token::is_closing_brace() const { return false; }
+    bool ClosingBrace::is_closing_brace() const { return true; }
 }
 
 #ifdef DEBUG

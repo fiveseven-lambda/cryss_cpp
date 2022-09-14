@@ -8,6 +8,7 @@
 #include "type.hpp"
 #include "lexer.hpp"
 #include "error.hpp"
+#include "parser.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -23,11 +24,9 @@ static void run(const Config &config){
     lexer::Lexer lexer(config.source, config.prompt);
     try {
         while(true){
-            auto token = lexer.next();
-            if(!token){
-                break;
-            }
-            token->debug_print(0);
+            auto item = parse_top_level(lexer);
+            if(!item) break;
+            item->debug_print(0);
         }
     }catch(std::unique_ptr<error::Error> &error){
         error->eprint(lexer.get_log());

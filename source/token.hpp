@@ -25,6 +25,13 @@ namespace token {
         virtual std::unique_ptr<ast::Expr> factor();
         virtual std::optional<ast::UnaryOperator> prefix(), suffix();
         virtual std::optional<ast::BinaryOperator> infix();
+        virtual bool
+            is_opening_parenthesis() const,
+            is_closing_parenthesis() const,
+            is_opening_bracket() const,
+            is_closing_bracket() const,
+            is_opening_brace() const,
+            is_closing_brace() const;
 #ifdef DEBUG
         virtual void debug_print(int) const = 0;
 #endif
@@ -38,7 +45,7 @@ namespace token {
         Identifier(std::string_view);
         std::unique_ptr<ast::Expr> factor() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     /**
@@ -50,7 +57,7 @@ namespace token {
         Number(std::string_view);
         std::unique_ptr<ast::Expr> factor() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     /**
@@ -62,7 +69,7 @@ namespace token {
         String(std::string value);
         std::unique_ptr<ast::Expr> factor() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `+`
@@ -70,7 +77,7 @@ namespace token {
         std::optional<ast::UnaryOperator> prefix() override;
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `++`
@@ -78,14 +85,14 @@ namespace token {
         std::optional<ast::UnaryOperator> prefix() override;
         std::optional<ast::UnaryOperator> suffix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `+=`
     class PlusEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `-`
@@ -93,7 +100,7 @@ namespace token {
         std::optional<ast::UnaryOperator> prefix() override;
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `--`
@@ -101,28 +108,28 @@ namespace token {
         std::optional<ast::UnaryOperator> prefix() override;
         std::optional<ast::UnaryOperator> suffix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `-=`
     class HyphenEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `*`
     class Asterisk : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `*=`
     class AsteriskEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `/`
@@ -130,275 +137,281 @@ namespace token {
         std::optional<ast::UnaryOperator> prefix() override;
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `/=`
     class SlashEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `%`
     class Percent : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `%=`
     class PercentEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `=`
     class Equal : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `==`
     class DoubleEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `!`
     class Exclamation : public Token {
         std::optional<ast::UnaryOperator> prefix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `!=`
     class ExclamationEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `<`
     class Less : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `<=`
     class LessEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `<<`
     class DoubleLess : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `<<=`
     class DoubleLessEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `<<<`
     class TripleLess : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `<<<=`
     class TripleLessEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `>`
     class Greater : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `>=`
     class GreaterEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `>>`
     class DoubleGreater : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `>>=`
     class DoubleGreaterEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `>>>`
     class TripleGreater : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `>>>=`
     class TripleGreaterEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `&`
     class Ampersand : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `&=`
     class AmpersandEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `&&`
     class DoubleAmpersand : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `|`
     class Bar : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `|=`
     class BarEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `||`
     class DoubleBar : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `^`
     class Circumflex : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `^=`
     class CircumflexEqual : public Token {
         std::optional<ast::BinaryOperator> infix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `.`
     class Dot : public Token {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `:`
     class Colon : public Token {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `;`
     class Semicolon : public Token {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `,`
     class Comma : public Token {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `?`
     class Question : public Token {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `#`
     class Hash : public Token {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `~`
     class Tilde : public Token {
         std::optional<ast::UnaryOperator> prefix() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `(`
     class OpeningParenthesis : public Token {
+        bool is_opening_parenthesis() const override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `)`
     class ClosingParenthesis : public Token {
+        bool is_closing_parenthesis() const override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `[`
     class OpeningBracket : public Token {
+        bool is_opening_bracket() const override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `]`
     class ClosingBracket : public Token {
+        bool is_closing_bracket() const override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `{`
     class OpeningBrace : public Token {
+        bool is_opening_brace() const override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
     //! `}`
     class ClosingBrace : public Token {
+        bool is_closing_brace() const override;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 }

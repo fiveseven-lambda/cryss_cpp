@@ -30,7 +30,7 @@ namespace type {
      */
     class Bool : public Type {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
@@ -39,7 +39,7 @@ namespace type {
      */
     class Int : public Type {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
@@ -48,7 +48,7 @@ namespace type {
      */
     class Rational : public Type {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
@@ -57,7 +57,7 @@ namespace type {
      */
     class Float : public Type {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
@@ -66,7 +66,7 @@ namespace type {
      */
     class Str : public Type {
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
@@ -82,7 +82,7 @@ namespace type {
         const Type &get_ret() const;
         std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> get_pair() const;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
@@ -113,7 +113,7 @@ namespace type {
         Sound(const Type &);
         const Type &get_result() const;
 #ifdef DEBUG
-        virtual void debug_print(int) const override;
+        void debug_print(int) const override;
 #endif
     };
 
