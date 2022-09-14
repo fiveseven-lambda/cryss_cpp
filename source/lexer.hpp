@@ -5,8 +5,6 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
-#include <vector>
-#include <string>
 #include <queue>
 #include <istream>
 #include <memory>
@@ -14,7 +12,15 @@
 
 #include "token.hpp"
 
+/**
+ * @brief 字句解析を行う
+ */
 namespace lexer {
+    /**
+     * @brief Lexer が内部で用いる．
+     *
+     * 入力を読まない．
+     */
     class LineLexer {
         std::vector<pos::Pos> comments;
         std::optional<std::pair<pos::Pos, std::string>> string;
@@ -27,6 +33,9 @@ namespace lexer {
         void deal_with_eof();
     };
 
+    /**
+     * @brief 入力を読みながら，トークンに分解する．
+     */
     class Lexer {
         std::istream &source;
         bool prompt;

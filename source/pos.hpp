@@ -1,5 +1,6 @@
 /**
  * @file pos.hpp
+ * @brief エラー出力のための位置情報をもつクラスを定義する．
  */
 #ifndef POS_HPP
 #define POS_HPP
@@ -10,8 +11,13 @@
 #include <vector>
 #include <string>
 
+/**
+ * @brief エラー出力のための位置情報をもつクラスを定義する．
+ */
 namespace pos {
-    //! ソースコード上の文字の位置
+    /**
+     * @brief ソースコード上の文字の位置
+     */
     class Pos {
         std::size_t line;
         std::size_t byte;
@@ -23,7 +29,9 @@ namespace pos {
         void eprint(const std::vector<std::string> &) const;
     };
 
-    //! ソースコード上の式や文の範囲
+    /**
+     * @brief ソースコード上の式や文の範囲
+     */
     class Range {
         Pos start;
         Pos end;

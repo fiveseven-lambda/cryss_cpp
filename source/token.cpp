@@ -9,6 +9,66 @@ namespace token {
     Number::Number(std::string_view value): value(value) {}
     String::String(std::string value) : value(std::move(value)) {}
 
+    std::unique_ptr<ast::Expr> Token::factor(){
+        return nullptr;
+    }
+    std::unique_ptr<ast::Expr> Identifier::factor(){
+        return std::make_unique<ast::Identifier>(name);
+    }
+    std::unique_ptr<ast::Expr> Number::factor(){
+        return std::make_unique<ast::Number>(value);
+    }
+    std::unique_ptr<ast::Expr> String::factor(){
+        return std::make_unique<ast::String>(std::move(value));
+    }
+
+    std::optional<ast::UnaryOperator> Token::prefix(){ return std::nullopt; }
+    std::optional<ast::UnaryOperator> Plus::prefix(){ return ast::UnaryOperator::Plus; }
+    std::optional<ast::UnaryOperator> Hyphen::prefix(){ return ast::UnaryOperator::Minus; }
+    std::optional<ast::UnaryOperator> DoublePlus::prefix(){ return ast::UnaryOperator::PreInc; }
+    std::optional<ast::UnaryOperator> DoubleHyphen::prefix(){ return ast::UnaryOperator::PreDec; }
+    std::optional<ast::UnaryOperator> Slash::prefix(){ return ast::UnaryOperator::Recip; }
+    std::optional<ast::UnaryOperator> Exclamation::prefix(){ return ast::UnaryOperator::LogicalNot; }
+    std::optional<ast::UnaryOperator> Tilde::prefix(){ return ast::UnaryOperator::BitNot; }
+
+    std::optional<ast::UnaryOperator> Token::suffix(){ return std::nullopt; }
+    std::optional<ast::UnaryOperator> DoublePlus::suffix(){ return ast::UnaryOperator::PostInc; }
+    std::optional<ast::UnaryOperator> DoubleHyphen::suffix(){ return ast::UnaryOperator::PostDec; }
+
+    std::optional<ast::BinaryOperator> Token::infix(){ return std::nullopt; }
+    std::optional<ast::BinaryOperator> Plus::infix(){ return ast::BinaryOperator::Add; }
+    std::optional<ast::BinaryOperator> Hyphen::infix(){ return ast::BinaryOperator::Sub; }
+    std::optional<ast::BinaryOperator> Asterisk::infix(){ return ast::BinaryOperator::Mul; }
+    std::optional<ast::BinaryOperator> Slash::infix(){ return ast::BinaryOperator::Div; }
+    std::optional<ast::BinaryOperator> Percent::infix(){ return ast::BinaryOperator::Rem; }
+    std::optional<ast::BinaryOperator> DoubleGreater::infix(){ return ast::BinaryOperator::RightShift; }
+    std::optional<ast::BinaryOperator> DoubleLess::infix(){ return ast::BinaryOperator::LeftShift; }
+    std::optional<ast::BinaryOperator> TripleGreater::infix(){ return ast::BinaryOperator::ForwardShift; }
+    std::optional<ast::BinaryOperator> TripleLess::infix(){ return ast::BinaryOperator::BackwardShift; }
+    std::optional<ast::BinaryOperator> DoubleEqual::infix(){ return ast::BinaryOperator::Equal; }
+    std::optional<ast::BinaryOperator> ExclamationEqual::infix(){ return ast::BinaryOperator::NotEqual; }
+    std::optional<ast::BinaryOperator> Less::infix(){ return ast::BinaryOperator::Less; }
+    std::optional<ast::BinaryOperator> LessEqual::infix(){ return ast::BinaryOperator::LessEqual; }
+    std::optional<ast::BinaryOperator> Greater::infix(){ return ast::BinaryOperator::Greater; }
+    std::optional<ast::BinaryOperator> GreaterEqual::infix(){ return ast::BinaryOperator::GreaterEqual; }
+    std::optional<ast::BinaryOperator> DoubleAmpersand::infix(){ return ast::BinaryOperator::LogicalAnd; }
+    std::optional<ast::BinaryOperator> DoubleBar::infix(){ return ast::BinaryOperator::LogicalOr; }
+    std::optional<ast::BinaryOperator> Ampersand::infix(){ return ast::BinaryOperator::BitAnd; }
+    std::optional<ast::BinaryOperator> Bar::infix(){ return ast::BinaryOperator::BitOr; }
+    std::optional<ast::BinaryOperator> Circumflex::infix(){ return ast::BinaryOperator::BitXor; }
+    std::optional<ast::BinaryOperator> Equal::infix(){ return ast::BinaryOperator::Assign; }
+    std::optional<ast::BinaryOperator> PlusEqual::infix(){ return ast::BinaryOperator::AddAssign; }
+    std::optional<ast::BinaryOperator> HyphenEqual::infix(){ return ast::BinaryOperator::SubAssign; }
+    std::optional<ast::BinaryOperator> AsteriskEqual::infix(){ return ast::BinaryOperator::MulAssign; }
+    std::optional<ast::BinaryOperator> SlashEqual::infix(){ return ast::BinaryOperator::DivAssign; }
+    std::optional<ast::BinaryOperator> PercentEqual::infix(){ return ast::BinaryOperator::RemAssign; }
+    std::optional<ast::BinaryOperator> AmpersandEqual::infix(){ return ast::BinaryOperator::BitAndAssign; }
+    std::optional<ast::BinaryOperator> BarEqual::infix(){ return ast::BinaryOperator::BitOrAssign; }
+    std::optional<ast::BinaryOperator> CircumflexEqual::infix(){ return ast::BinaryOperator::BitXorAssign; }
+    std::optional<ast::BinaryOperator> DoubleGreaterEqual::infix(){ return ast::BinaryOperator::RightShiftAssign; }
+    std::optional<ast::BinaryOperator> DoubleLessEqual::infix(){ return ast::BinaryOperator::LeftShiftAssign; }
+    std::optional<ast::BinaryOperator> TripleGreaterEqual::infix(){ return ast::BinaryOperator::ForwardShiftAssign; }
+    std::optional<ast::BinaryOperator> TripleLessEqual::infix(){ return ast::BinaryOperator::BackwardShiftAssign; }
 }
 
 #ifdef DEBUG

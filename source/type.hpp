@@ -1,5 +1,6 @@
 /**
  * @file type.hpp
+ * @brief 型を定義する．
  */
 #ifndef TYPE_HPP
 #define TYPE_HPP
@@ -25,36 +26,45 @@ namespace type {
     };
 
     /**
-     * @brief プリミティブ型の種類を表す
+     * @brief bool 型
      */
-    enum class PrimitiveKind {
-        Boolean,
-        Integer,
-        Rational,
-        Float,
-    };
-
-    /**
-     * @brief プリミティブ型
-     */
-    class Primitive : public Type {
-        PrimitiveKind kind;
-    public:
-        Primitive(PrimitiveKind);
-        PrimitiveKind get_kind() const;
+    class Bool : public Type {
 #ifdef DEBUG
         virtual void debug_print(int) const override;
 #endif
     };
 
     /**
-     * @brief タプル
+     * @brief int 型
      */
-    class Tuple : public Type {
-        const std::vector<std::reference_wrapper<const Type>> elements_type;
-    public:
-        Tuple(const std::vector<std::reference_wrapper<const Type>> &);
-        const std::vector<std::reference_wrapper<const Type>> &get_elements_type() const;
+    class Int : public Type {
+#ifdef DEBUG
+        virtual void debug_print(int) const override;
+#endif
+    };
+
+    /**
+     * @brief rational 型
+     */
+    class Rational : public Type {
+#ifdef DEBUG
+        virtual void debug_print(int) const override;
+#endif
+    };
+
+    /**
+     * @brief float 型
+     */
+    class Float : public Type {
+#ifdef DEBUG
+        virtual void debug_print(int) const override;
+#endif
+    };
+
+    /**
+     * @brief str 型
+     */
+    class Str : public Type {
 #ifdef DEBUG
         virtual void debug_print(int) const override;
 #endif
@@ -63,93 +73,110 @@ namespace type {
     /**
      * @brief 関数型
      */
-    class Function : public Type {
-        const Tuple &arguments_type;
-        const Type &return_type;
+    class Func : public Type {
+        std::vector<std::reference_wrapper<const Type>> args;
+        const Type &ret;
     public:
-        Function(const Tuple &, const Type &);
-        const std::vector<std::reference_wrapper<const Type>> &get_arguments_type() const;
-        const Type &get_return_type() const;
-        std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> into_pair() const;
+        Func(const std::vector<std::reference_wrapper<const Type>> &, const Type &);
+        const std::vector<std::reference_wrapper<const Type>> &get_args() const;
+        const Type &get_ret() const;
+        std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> get_pair() const;
 #ifdef DEBUG
         virtual void debug_print(int) const override;
 #endif
     };
 
     /**
-     * @brief `std::unordered_set<std::unique_ptr<Primitive>>`に用いるハッシュ関数オブジェクト
+     * @brief `std::unique_ptr<Func>` をもつ `std::unordered_set`に用いるハッシュ関数オブジェクト
      */
-    struct PrimitiveHash {
-        using is_transparent = void;
-        std::size_t operator()(const PrimitiveKind &) const noexcept;
-        std::size_t operator()(const std::unique_ptr<Primitive> &) const noexcept;
-    };
-    /**
-     * @brief `std::unordered_set<std::unique_ptr<Primitive>>`に用いる比較関数オブジェクト
-     */
-    struct PrimitiveEq {
-        using is_transparent = void;
-        bool operator()(const PrimitiveKind &, const PrimitiveKind &) const noexcept;
-        bool operator()(const PrimitiveKind &, const std::unique_ptr<Primitive> &) const noexcept;
-        bool operator()(const std::unique_ptr<Primitive> &, const std::unique_ptr<Primitive> &) const noexcept;
-    };
-    /**
-     * @brief `std::unordered_set<std::unique_ptr<Tuple>>`に用いるハッシュ関数オブジェクト
-     */
-    struct TupleHash {
-        using is_transparent = void;
-        std::size_t operator()(const std::vector<std::reference_wrapper<const Type>> &) const noexcept;
-        std::size_t operator()(const std::unique_ptr<Tuple> &) const noexcept;
-    };
-    /**
-     * @brief `std::unordered_set<std::unique_ptr<Tuple>>`に用いる比較関数オブジェクト
-     */
-    struct TupleEq {
-        using is_transparent = void;
-        bool operator()(const std::vector<std::reference_wrapper<const Type>> &, const std::vector<std::reference_wrapper<const Type>> &) const noexcept;
-        bool operator()(const std::vector<std::reference_wrapper<const Type>> &, const std::unique_ptr<Tuple> &) const noexcept;
-        bool operator()(const std::unique_ptr<Tuple> &, const std::unique_ptr<Tuple> &) const noexcept;
-    };
-    /**
-     * @brief `std::unordered_set<std::unique_ptr<Function>>`に用いるハッシュ関数オブジェクト
-     */
-    struct FunctionHash {
+    struct FuncHash {
         using is_transparent = void;
         std::size_t operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &) const noexcept;
-        std::size_t operator()(const std::unique_ptr<Function> &) const noexcept;
+        std::size_t operator()(const std::unique_ptr<Func> &) const noexcept;
     };
     /**
-     * @brief `std::unordered_set<std::unique_ptr<Function>>`に用いる比較関数オブジェクト
+     * @brief `std::unique_ptr<Func>` をもつ `std::unordered_set`に用いる比較関数オブジェクト
      */
-    struct FunctionEq {
+    struct FuncEq {
         using is_transparent = void;
         bool operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &, const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &) const noexcept;
-        bool operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &, const std::unique_ptr<Function> &) const noexcept;
-        bool operator()(const std::unique_ptr<Function> &, const std::unique_ptr<Function> &) const noexcept;
+        bool operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &, const std::unique_ptr<Func> &) const noexcept;
+        bool operator()(const std::unique_ptr<Func> &, const std::unique_ptr<Func> &) const noexcept;
+    };
+
+    /**
+     * @brief Sound 型
+     */
+    class Sound : public Type {
+        const Type &result;
+    public:
+        Sound(const Type &);
+        const Type &get_result() const;
+#ifdef DEBUG
+        virtual void debug_print(int) const override;
+#endif
+    };
+
+    /**
+     * @brief `std::unique_ptr<Sound>` をもつ `std::unordered_set`に用いるハッシュ関数オブジェクト
+     */
+    struct SoundHash {
+        using is_transparent = void;
+        std::size_t operator()(const Type &) const noexcept;
+        std::size_t operator()(const std::unique_ptr<Sound> &) const noexcept;
+    };
+    /**
+     * @brief `std::unique_ptr<Sound>` をもつ `std::unordered_set`に用いる比較関数オブジェクト
+     */
+    struct SoundEq {
+        using is_transparent = void;
+        bool operator()(const Type &, const Type &) const noexcept;
+        bool operator()(const Type &, const std::unique_ptr<Sound> &) const noexcept;
+        bool operator()(const std::unique_ptr<Sound> &, const std::unique_ptr<Sound> &) const noexcept;
     };
 
     /**
      * @brief 型を管理する．
      *
-     * `std::unique_ptr` で型を持つ．同じ型を表すオブジェクトが複数作られることはないため，アドレスで比較できる．
+     * 同じ型を表すオブジェクトを複数作ることはないため，アドレスで比較できる．
      */
     class TypeContext {
-        std::unordered_set<std::unique_ptr<Primitive>, PrimitiveHash, PrimitiveEq> primitives;
-        std::unordered_set<std::unique_ptr<Tuple>, TupleHash, TupleEq> tuples;
-        std::unordered_set<std::unique_ptr<Function>, FunctionHash, FunctionEq> functions;
+        Bool bool_ty;
+        Int int_ty;
+        Rational rational_ty;
+        Float float_ty;
+        Str str_ty;
+        std::unordered_set<std::unique_ptr<Func>, FuncHash, FuncEq> funcs;
+        std::unordered_set<std::unique_ptr<Sound>, SoundHash, SoundEq> sounds;
     public:
         /**
-         * @brief プリミティブ型を得る．
+         * @brief bool 型を得る．
          */
-        const Primitive &primitive(PrimitiveKind);
+        const Bool &get_bool() &;
         /**
-         * @brief タプルを得る．
+         * @brief int 型を得る．
          */
-        const Tuple &tuple(const std::vector<std::reference_wrapper<const Type>> &);
+        const Int &get_int() &;
+        /**
+         * @brief rational 型を得る．
+         */
+        const Rational &get_rational() &;
+        /**
+         * @brief float 型を得る．
+         */
+        const Float &get_float() &;
+        /**
+         * @brief str 型を得る．
+         */
+        const Str &get_str() &;
         /**
          * @brief 関数型を得る．
          */
-        const Function &function(const std::vector<std::reference_wrapper<const Type>> &, const Type &);
+        const Func &get_func(const std::vector<std::reference_wrapper<const Type>> &, const Type &) &;
+        /**
+         * @brief 音を得る．
+         */
+        const Sound &get_sound(const Type &);
 #ifdef DEBUG
         void debug_print(int) const;
 #endif

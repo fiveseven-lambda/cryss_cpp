@@ -4,8 +4,6 @@
 #include "lexer.hpp"
 #include "error.hpp"
 
-#include <iostream>
-
 namespace lexer {
     /**
      * @brief コンストラクタ．
@@ -25,6 +23,9 @@ namespace lexer {
         return log;
     }
 
+    /**
+     * @brief 次のトークンを消費せずに返す．
+     */
     std::unique_ptr<token::Token> &Lexer::peek(){
         while(tokens.empty()){
             if(source){
@@ -56,12 +57,22 @@ namespace lexer {
         return tokens.front();
     }
 
+    /**
+     * @brief 次のトークンを消費して返す．
+     */
     std::unique_ptr<token::Token> Lexer::next(){
         auto ret = std::move(peek());
         tokens.pop();
         return ret;
     }
 
+    /**
+     * @brief 1 行分の文字列を受け取って，トークンに分解する．
+     * @param line_num 位置情報に用いられる行番号．
+     * @param line 1 行ぶんの文字列．
+     * @param tokens トークンの格納先．
+     * @throw error::UnexpectedCharacter トークンの開始として適さない文字列があった．
+     */
     void LineLexer::run(
         std::size_t line_num,
         const std::string_view &line,
@@ -102,7 +113,8 @@ namespace lexer {
                         char ch;
                         if(line[cursor] == '\\'){
                             if(cursor == line.size() - 1){
-                                throw error::make<error::InvalidEscape>(pos::Pos(line_num, cursor));
+                                // 行末が `\` なら改行文字を push しない
+                                return;
                             }else{
                                 cursor++;
                                 switch(line[cursor]){
@@ -223,9 +235,17 @@ namespace lexer {
         }
     }
 
+    /**
+     * @brief EOF に達したときに呼び出す．
+     * コメントが終了しているか，文字列リテラルが終了しているか確認する．
+     * @throw error::UnterminatedComment コメントが終了していなかった．
+     * @throw error::UnterminatedStringLiteral 文字列リテラルが終了していなかった．
+     */
     void LineLexer::deal_with_eof(){
         if(!comments.empty()){
             throw error::make<error::UnterminatedComment>(std::move(comments));
+        }else if(string){
+            throw error::make<error::UnterminatedStringLiteral>(string.value().first);
         }
     }
 }

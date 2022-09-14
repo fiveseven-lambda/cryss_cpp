@@ -7,64 +7,64 @@
 
 namespace type {
     Type::~Type() = default;
-    Primitive::Primitive(PrimitiveKind kind): kind(kind) {}
-    Tuple::Tuple(const std::vector<std::reference_wrapper<const Type>> &elements_type): elements_type(elements_type) {}
-    Function::Function(const Tuple &arguments_type, const Type &return_type) : arguments_type(arguments_type), return_type(return_type) {}
 
-    PrimitiveKind Primitive::get_kind() const { return kind; }
-    const std::vector<std::reference_wrapper<const Type>> &Tuple::get_elements_type() const { return elements_type; }
-    const std::vector<std::reference_wrapper<const Type>> &Function::get_arguments_type() const { return arguments_type.get_elements_type(); }
-    const Type &Function::get_return_type() const { return return_type; }
-    std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> Function::into_pair() const { return {arguments_type.get_elements_type(), return_type}; }
+    Func::Func(const std::vector<std::reference_wrapper<const Type>> &args, const Type &ret): args(std::move(args)), ret(ret) {}
 
-    std::size_t PrimitiveHash::operator()(const PrimitiveKind &kind) const noexcept { return std::hash<PrimitiveKind>()(kind); }
-    std::size_t PrimitiveHash::operator()(const std::unique_ptr<Primitive> &type) const noexcept { return (*this)(type->get_kind()); }
-    bool PrimitiveEq::operator()(const PrimitiveKind &left, const PrimitiveKind &right) const noexcept { return left == right; }
-    bool PrimitiveEq::operator()(const PrimitiveKind &left, const std::unique_ptr<Primitive> &right) const noexcept { return left == right->get_kind(); }
-    bool PrimitiveEq::operator()(const std::unique_ptr<Primitive> &left, const std::unique_ptr<Primitive> &right) const noexcept { return left->get_kind() == right->get_kind(); }
+    const std::vector<std::reference_wrapper<const Type>> &Func::get_args() const { return args; }
+    const Type &Func::get_ret() const { return ret; }
+    std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> Func::get_pair() const { return {args, ret}; }
 
-    std::size_t TupleHash::operator()(const std::vector<std::reference_wrapper<const Type>> &elements_type) const noexcept {
+    std::size_t FuncHash::operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> & pair) const noexcept {
         std::size_t seed = 0;
-        // 注意：Type * 型のアドレス値を使う
-        for(const Type &element_type : elements_type) boost::hash_combine<const Type *>(seed, &element_type);
-        return seed;
-    }
-    std::size_t TupleHash::operator()(const std::unique_ptr<Tuple> &type) const noexcept { return (*this)(type->get_elements_type()); }
-    bool TupleEq::operator()(const std::vector<std::reference_wrapper<const Type>> &left, const std::vector<std::reference_wrapper<const Type>> &right) const noexcept {
-        if(left.size() != right.size()) return false;
-        for(std::size_t i = 0; i < left.size(); i++) if(&left[i].get() != &right[i].get()) return false;
-        return true;
-    }
-    bool TupleEq::operator()(const std::vector<std::reference_wrapper<const Type>> &left, const std::unique_ptr<Tuple> &right) const noexcept { return (*this)(left, right->get_elements_type()); }
-    bool TupleEq::operator()(const std::unique_ptr<Tuple> &left, const std::unique_ptr<Tuple> &right) const noexcept { return (*this)(left->get_elements_type(), right->get_elements_type()); }
-
-    std::size_t FunctionHash::operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> & pair) const noexcept {
-        std::size_t seed = TupleHash()(pair.first);
+        for(const Type &arg : pair.first) boost::hash_combine<const Type *>(seed, &arg);
         boost::hash_combine<const Type *>(seed, &pair.second);
         return seed;
     }
-    std::size_t FunctionHash::operator()(const std::unique_ptr<Function> &type) const noexcept {
-        return (*this)(type->into_pair());
+    std::size_t FuncHash::operator()(const std::unique_ptr<Func> &type) const noexcept { return (*this)(type->get_pair()); }
+    bool FuncEq::operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &left, const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &right) const noexcept {
+        if(&left.second != &right.second) return false;
+        if(left.first.size() != right.first.size()) return false;
+        for(std::size_t i = 0; i < left.first.size(); i++){
+            if(&left.first[i].get() != &right.first[i].get()) return false;
+        }
+        return true;
     }
-    bool FunctionEq::operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &left, const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &right) const noexcept {
-        return TupleEq()(left.first, right.first) && (&left.second == &right.second);
-    }
-    bool FunctionEq::operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &left, const std::unique_ptr<Function> &right) const noexcept { return (*this)(left, right->into_pair()); }
-    bool FunctionEq::operator()(const std::unique_ptr<Function> &left, const std::unique_ptr<Function> &right) const noexcept { return (*this)(left->into_pair(), right->into_pair()); }
+    bool FuncEq::operator()(const std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &> &left, const std::unique_ptr<Func> &right) const noexcept { return (*this)(left, right->get_pair()); }
+    bool FuncEq::operator()(const std::unique_ptr<Func> &left, const std::unique_ptr<Func> &right) const noexcept { return (*this)(left->get_pair(), right->get_pair()); }
 
-    const Primitive &TypeContext::primitive(PrimitiveKind kind){
-        auto it = primitives.find(kind);
-        if(it == primitives.end()) it = primitives.insert(std::make_unique<Primitive>(kind)).first;
+    Sound::Sound(const Type &result): result(result) {}
+
+    const Type &Sound::get_result() const { return result; }
+
+    std::size_t SoundHash::operator()(const Type &result) const noexcept {
+        return std::hash<const Type *>()(&result);
+    }
+    std::size_t SoundHash::operator()(const std::unique_ptr<Sound> &type) const noexcept {
+        return (*this)(type->get_result());
+    }
+    bool SoundEq::operator()(const Type &left, const Type &right) const noexcept {
+        return &left == &right;
+    }
+    bool SoundEq::operator()(const Type &left, const std::unique_ptr<Sound> &right) const noexcept {
+        return (*this)(left, right->get_result());
+    }
+    bool SoundEq::operator()(const std::unique_ptr<Sound> &left, const std::unique_ptr<Sound> &right) const noexcept {
+        return (*this)(left->get_result(), right->get_result());
+    }
+
+    const Bool &TypeContext::get_bool() & { return bool_ty; }
+    const Int &TypeContext::get_int() & { return int_ty; }
+    const Rational &TypeContext::get_rational() & { return rational_ty; }
+    const Float &TypeContext::get_float() & { return float_ty; }
+    const Str &TypeContext::get_str() & { return str_ty; }
+    const Func &TypeContext::get_func(const std::vector<std::reference_wrapper<const Type>> &args, const Type &ret) & {
+        auto it = funcs.find(std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &>(args, ret));
+        if(it == funcs.end()) it = funcs.insert(std::make_unique<Func>(args, ret)).first;
         return **it;
     }
-    const Tuple &TypeContext::tuple(const std::vector<std::reference_wrapper<const Type>> &elements_type){
-        auto it = tuples.find(elements_type);
-        if(it == tuples.end()) it = tuples.insert(std::make_unique<Tuple>(elements_type)).first;
-        return **it;
-    }
-    const Function &TypeContext::function(const std::vector<std::reference_wrapper<const Type>> &arguments_type, const Type &return_type){
-        auto it = functions.find(std::pair<const std::vector<std::reference_wrapper<const Type>> &, const Type &>(arguments_type, return_type));
-        if(it == functions.end()) it = functions.insert(std::make_unique<Function>(tuple(arguments_type), return_type)).first;
+    const Sound &TypeContext::get_sound(const Type &result){
+        auto it = sounds.find(result);
+        if(it == sounds.end()) it = sounds.insert(std::make_unique<Sound>(result)).first;
         return **it;
     }
 }
@@ -75,38 +75,43 @@ static void indent(int depth){
     for(int i = 0; i < depth; i++) std::cout << "    ";
 }
 namespace type {
-    void Primitive::debug_print(int depth) const {
+    void Bool::debug_print(int depth) const {
         indent(depth);
-        std::string_view name;
-        switch(kind){
-            case PrimitiveKind::Boolean: name = "boolean"; break;
-            case PrimitiveKind::Integer: name = "integer"; break;
-            case PrimitiveKind::Rational: name = "rational"; break;
-            case PrimitiveKind::Float: name = "float";
-        }
-        std::cout << name << std::endl;
+        std::cout << "bool" << std::endl;
     }
-    void Tuple::debug_print(int depth) const {
+    void Int::debug_print(int depth) const {
         indent(depth);
-        std::cout << "tuple(" << elements_type.size() << ")" << std::endl;
-        for(const Type &element_type : elements_type){
-            element_type.debug_print(depth + 1);
-        }
+        std::cout << "int" << std::endl;
     }
-    void Function::debug_print(int depth) const {
+    void Rational::debug_print(int depth) const {
         indent(depth);
-        std::cout << "function(" << arguments_type.get_elements_type().size() << ") (" << std::endl;
-        for(const Type &argument_type: arguments_type.get_elements_type()){
-            argument_type.debug_print(depth + 1);
+        std::cout << "rational" << std::endl;
+    }
+    void Float::debug_print(int depth) const {
+        indent(depth);
+        std::cout << "float" << std::endl;
+    }
+    void Str::debug_print(int depth) const {
+        indent(depth);
+        std::cout << "str" << std::endl;
+    }
+    void Func::debug_print(int depth) const {
+        indent(depth);
+        std::cout << "func(" << args.size() << ") (" << std::endl;
+        for(const Type &arg: args){
+            arg.debug_print(depth + 1);
         }
         indent(depth);
         std::cout << ") ->" << std::endl;
-        return_type.debug_print(depth + 1);
+        ret.debug_print(depth + 1);
+    }
+    void Sound::debug_print(int depth) const {
+        indent(depth);
+        std::cout << "Sound" << std::endl;
+        result.debug_print(depth + 1);
     }
     void TypeContext::debug_print(int depth) const {
-        for(auto &type : primitives) type->debug_print(depth);
-        for(auto &type : tuples) type->debug_print(depth);
-        for(auto &type : functions) type->debug_print(depth);
+        for(auto &func : funcs) func->debug_print(depth);
     }
 }
 #endif

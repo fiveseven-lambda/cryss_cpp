@@ -8,7 +8,9 @@
 #include <memory>
 #include "pos.hpp"
 
-//! 各種エラーを定義する．
+/**
+ * @brief 各種エラーを定義する．
+ */
 namespace error {
     /**
      * @brief 全てのエラーの基底クラス．
@@ -35,7 +37,6 @@ namespace error {
 
     /**
      * @brief Lexer：予期せぬ文字が現れた．
-     *
      * 空白とコメント以外に，トークンの始まりとして適さない文字があった．
      */
     class UnexpectedCharacter : public Error {
@@ -46,9 +47,7 @@ namespace error {
     };
 
     /**
-     * @brief Lexer：コメントが終了しなかった．
-     *
-     * コメントの途中で EOF に達した．
+     * @brief Lexer：コメントが終了しないまま EOF に達した．
      */
     class UnterminatedComment : public Error {
         std::vector<pos::Pos> poss;
@@ -58,16 +57,15 @@ namespace error {
     };
 
     /**
-     * @brief Lexer：文字列リテラル中に無効なエスケープシーケンスがあった．
-     *
-     * 行が `\` で終了した．
+     * @brief Lexer：文字列リリテラが終了しないまま EOF に達した．
      */
-    class InvalidEscape : public Error {
+    class UnterminatedStringLiteral : public Error {
         pos::Pos pos;
     public:
-        InvalidEscape(pos::Pos);
+        UnterminatedStringLiteral(pos::Pos pos);
         void eprint(const std::vector<std::string> &) const override;
     };
+
 }
 
 #endif
