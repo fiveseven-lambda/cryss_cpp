@@ -106,7 +106,7 @@ namespace pos {
      * @brief ソースコードから当該の行を切り出して出力する．
      * @param source ソースコード（文字列）
      */
-    void Pos::eprint(const std::vector<std::string> &source) const {
+    void Pos::eprint(const std::deque<std::string> &source) const {
         std::cerr
             << source[line].substr(0, byte)
             << " !-> "
@@ -117,7 +117,7 @@ namespace pos {
      * @brief ソースコードから当該の範囲の前後を切り出して出力する．
      * @param source ソースコード（文字列）
      */
-    void Range::eprint(const std::vector<std::string> &source) const {
+    void Range::eprint(const std::deque<std::string> &source) const {
         auto [sline, sbyte] = start.into_pair();
         auto [eline, ebyte] = end.into_pair();
         if(sline == eline){

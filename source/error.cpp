@@ -50,42 +50,42 @@ namespace error {
      */
     EmptyParenthesis::EmptyParenthesis(pos::Range open, pos::Range close): open(std::move(open)), close(std::move(close)) {}
 
-    void UnexpectedCharacter::eprint(const std::vector<std::string> &log) const {
+    void UnexpectedCharacter::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
         pos.eprint(log);
     }
-    void UnterminatedComment::eprint(const std::vector<std::string> &log) const {
+    void UnterminatedComment::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unterminated comment" << std::endl;
         for(const pos::Pos &pos : poss){
             std::cerr << "started at " << pos << std::endl;
             pos.eprint(log);
         }
     }
-    void UnterminatedStringLiteral::eprint(const std::vector<std::string> &log) const {
+    void UnterminatedStringLiteral::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unterminated string literal (started at " << pos << ")" << std::endl;
         pos.eprint(log);
     }   
-    void UnexpectedTokenAfterPrefix::eprint(const std::vector<std::string> &log) const {
+    void UnexpectedTokenAfterPrefix::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unexpected token at " << token << std::endl;
         token.eprint(log);
         std::cerr << "after prefix operator at " << prefix << std::endl;
         prefix.eprint(log);
     }
-    void EOFAfterPrefix::eprint(const std::vector<std::string> &log) const {
+    void EOFAfterPrefix::eprint(const std::deque<std::string> &log) const {
         std::cerr << "expected token, found EOF after prefix operator at " << prefix << std::endl;
         prefix.eprint(log);
     }
-    void NoClosingParenthesis::eprint(const std::vector<std::string> &log) const {
+    void NoClosingParenthesis::eprint(const std::deque<std::string> &log) const {
         std::cerr << "no closing parenthesis corresponding to opening parenthesis at " << open << std::endl;
         open.eprint(log);
     }
-    void UnexpectedTokenInParenthesis::eprint(const std::vector<std::string> &log) const {
+    void UnexpectedTokenInParenthesis::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unexpected token at " << token << std::endl;
         token.eprint(log);
         std::cerr << "parenthesis opened at " << open << std::endl;
         open.eprint(log);
     }
-    void EmptyParenthesis::eprint(const std::vector<std::string> &log) const {
+    void EmptyParenthesis::eprint(const std::deque<std::string> &log) const {
         std::cerr << "empty parenthesis opened at " << open << std::endl;
         open.eprint(log);
         std::cerr << "closed at " << close << std::endl;

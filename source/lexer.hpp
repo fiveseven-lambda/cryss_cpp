@@ -9,6 +9,7 @@
 #include <istream>
 #include <memory>
 #include <optional>
+#include <deque>
 
 #include "token.hpp"
 
@@ -40,13 +41,13 @@ namespace lexer {
         std::istream &source;
         bool prompt;
         bool is_beginning_of_sentence;
-        std::vector<std::string> log;
+        std::deque<std::string> log;
         std::queue<std::unique_ptr<token::Token>> tokens;
         LineLexer line_lexer;
     public:
         Lexer(std::istream &, bool);
         void beginning_of_sentence();
-        const std::vector<std::string> &get_log() const;
+        const std::deque<std::string> &get_log() const;
         std::unique_ptr<token::Token> next(), &peek();
     };
 }

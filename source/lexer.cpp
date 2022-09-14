@@ -19,7 +19,7 @@ namespace lexer {
     /**
      * @brief 今までに読んだ入力の記録を返す．
      */
-    const std::vector<std::string> &Lexer::get_log() const {
+    const std::deque<std::string> &Lexer::get_log() const {
         return log;
     }
 

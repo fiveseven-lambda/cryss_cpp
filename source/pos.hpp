@@ -9,6 +9,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <deque>
 #include <string>
 
 /**
@@ -26,7 +27,7 @@ namespace pos {
         Pos(std::size_t, std::size_t);
         std::pair<std::size_t, std::size_t> into_pair() const;
         friend std::ostream &operator<<(std::ostream &, const Pos &);
-        void eprint(const std::vector<std::string> &) const;
+        void eprint(const std::deque<std::string> &) const;
     };
 
     /**
@@ -47,7 +48,7 @@ namespace pos {
         friend Range operator+(const Range &, const Range &);
         Range clone();
         friend std::ostream &operator<<(std::ostream &, const Range &);
-        void eprint(const std::vector<std::string> &) const;
+        void eprint(const std::deque<std::string> &) const;
     };
 }
 

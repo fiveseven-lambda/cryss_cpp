@@ -5,6 +5,7 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
+#include <deque>
 #include <memory>
 #include "pos.hpp"
 
@@ -22,7 +23,7 @@ namespace error {
          * @brief 標準エラー出力でエラーの内容を説明する．
          * @param source ソースコードの文字列
          */
-        void virtual eprint(const std::vector<std::string> &source) const = 0;
+        void virtual eprint(const std::deque<std::string> &source) const = 0;
     };
 
     /**
@@ -43,7 +44,7 @@ namespace error {
         pos::Pos pos;
     public:
         UnexpectedCharacter(pos::Pos);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -53,7 +54,7 @@ namespace error {
         std::vector<pos::Pos> poss;
     public:
         UnterminatedComment(std::vector<pos::Pos>);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -63,7 +64,7 @@ namespace error {
         pos::Pos pos;
     public:
         UnterminatedStringLiteral(pos::Pos);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -73,7 +74,7 @@ namespace error {
         pos::Range prefix, token;
     public:
         UnexpectedTokenAfterPrefix(pos::Range, pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -83,7 +84,7 @@ namespace error {
         pos::Range prefix;
     public:
         EOFAfterPrefix(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -93,7 +94,7 @@ namespace error {
         pos::Range open;
     public:
         NoClosingParenthesis(pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -103,7 +104,7 @@ namespace error {
         pos::Range open, token;
     public:
         UnexpectedTokenInParenthesis(pos::Range, pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
@@ -113,7 +114,7 @@ namespace error {
         pos::Range open, close;
     public:
         EmptyParenthesis(pos::Range, pos::Range);
-        void eprint(const std::vector<std::string> &) const override;
+        void eprint(const std::deque<std::string> &) const override;
     };
 }
 
