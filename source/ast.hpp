@@ -214,6 +214,8 @@ namespace ast {
     };
     class Block : public Stmt {
         std::vector<std::unique_ptr<Stmt>> stmts;
+    public:
+        Block(std::vector<std::unique_ptr<Stmt>>);
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif

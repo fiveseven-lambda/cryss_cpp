@@ -173,6 +173,78 @@ namespace error {
         void eprint(const std::deque<std::string> &) const override;
     };
     /**
+     *
+     */
+    class EOFAfterIf : public Error {
+        pos::Range keyword;
+    public:
+        EOFAfterIf(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class UnexpectedTokenAfterIf : public Error {
+        pos::Range keyword, token;
+    public:
+        UnexpectedTokenAfterIf(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class EOFAfterWhile : public Error {
+        pos::Range keyword;
+    public:
+        EOFAfterWhile(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class UnexpectedTokenAfterWhile : public Error {
+        pos::Range keyword, token;
+    public:
+        UnexpectedTokenAfterWhile(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class EOFAfterBreak : public Error {
+        pos::Range keyword;
+    public:
+        EOFAfterBreak(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class UnexpectedTokenAfterBreak : public Error {
+        pos::Range keyword, token;
+    public:
+        UnexpectedTokenAfterBreak(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class EOFAfterContinue : public Error {
+        pos::Range keyword;
+    public:
+        EOFAfterContinue(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     *
+     */
+    class UnexpectedTokenAfterContinue : public Error {
+        pos::Range keyword, token;
+    public:
+        UnexpectedTokenAfterContinue(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
      * @brief エラーメッセージが未実装
      */
     class Unimplemented: public Error {
@@ -183,5 +255,7 @@ namespace error {
         void eprint(const std::deque<std::string> &) const override;
     };
 }
+
+#define TODO throw error::make<error::Unimplemented>(__FILE__, __LINE__)
 
 #endif

@@ -45,6 +45,8 @@ namespace ast {
         cond(std::move(cond)),
         stmt_true(std::move(stmt_true)),
         stmt_false(std::move(stmt_false)) {}
+    Block::Block(std::vector<std::unique_ptr<Stmt>> stmts):
+        stmts(std::move(stmts)) {}
 }
 
 #ifdef DEBUG
@@ -60,16 +62,16 @@ public:
 };
 namespace ast {
     void Identifier::debug_print(int depth) const {
-        std::cout << indent(depth) << "identifier(" << name << ")" << std::endl;
+        std::cout << indent(depth) << pos << " identifier(" << name << ")" << std::endl;
     }
     void Number::debug_print(int depth) const {
-        std::cout << indent(depth) << "number(" << value << ")" << std::endl;
+        std::cout << indent(depth) << pos << " number(" << value << ")" << std::endl;
     }
     void String::debug_print(int depth) const {
-        std::cout << indent(depth) << "string(" << value << ")" << std::endl;
+        std::cout << indent(depth) << pos << " string(" << value << ")" << std::endl;
     }
     void Call::debug_print(int depth) const {
-        std::cout << indent(depth) << "call" << std::endl;
+        std::cout << indent(depth) << pos << " call" << std::endl;
         func->debug_print(depth + 1);
         std::cout << indent(depth) << "args(" << args.size() << "):" << std::endl;
         for(auto &arg : args) arg->debug_print(depth + 1);
@@ -87,7 +89,7 @@ namespace ast {
             case UnaryOperator::PostInc: name = "postfix increment"; break;
             case UnaryOperator::PostDec: name = "postfix decrement";
         }
-        std::cout << indent(depth) << "unary operation(" << name << ")" << std::endl;
+        std::cout << indent(depth) << pos << " unary operation(" << name << ")" << std::endl;
         operand->debug_print(depth + 1);
     }
     void BinaryOperation::debug_print(int depth) const {
@@ -127,44 +129,44 @@ namespace ast {
             case BinaryOperator::ForwardShiftAssign: name = "forward shift assign"; break;
             case BinaryOperator::BackwardShiftAssign: name = "backward shift assign"; break;
         }
-        std::cout << indent(depth) << "binary operation(" << name << ")" << std::endl;
+        std::cout << indent(depth) << pos << " binary operation(" << name << ")" << std::endl;
         left->debug_print(depth + 1);
         right->debug_print(depth + 1);
     }
     void Index::debug_print(int depth) const {
-        std::cout << indent(depth) << "index" << std::endl;
+        std::cout << indent(depth) << pos << " index" << std::endl;
         operand->debug_print(depth + 1);
         index->debug_print(depth + 1);
     }
     void Group::debug_print(int depth) const {
-        std::cout << indent(depth) << "group" << std::endl;
+        std::cout << indent(depth) << pos << " group" << std::endl;
         expr->debug_print(depth + 1);
     }
     void List::debug_print(int depth) const {
-        std::cout << indent(depth) << "list(" << elems.size() << ")" << std::endl;
+        std::cout << indent(depth) << pos << " list(" << elems.size() << ")" << std::endl;
         for(auto &elem : elems) elem->debug_print(depth + 1);
     }
     void Tuple::debug_print(int depth) const {
-        std::cout << indent(depth) << "tuple(" << elems.size() << ")" << std::endl;
+        std::cout << indent(depth) << pos << " tuple(" << elems.size() << ")" << std::endl;
         for(auto &elem : elems) elem->debug_print(depth + 1);
     }
     void ExprStmt::debug_print(int depth) const {
         if(expr){
-            std::cout << indent(depth) << "expression statement" << std::endl;
+            std::cout << indent(depth) << pos << " expression statement" << std::endl;
             expr->debug_print(depth + 1);
         }else{
-            std::cout << indent(depth) << "expression statement (empty)" << std::endl;
+            std::cout << indent(depth) << pos << " expression statement (empty)" << std::endl;
         }
     }
     void While::debug_print(int depth) const {
-        std::cout << indent(depth) << "while" << std::endl;
+        std::cout << indent(depth) << pos << " while" << std::endl;
         cond->debug_print(depth + 1);
         std::cout << indent(depth) << "do" << std::endl;
         stmt->debug_print(depth + 1);
         std::cout << indent(depth) << "end while" << std::endl;
     }
     void If::debug_print(int depth) const {
-        std::cout << indent(depth) << "if" << std::endl;
+        std::cout << indent(depth) << pos << " if" << std::endl;
         cond->debug_print(depth + 1);
         std::cout << indent(depth) << "then" << std::endl;
         stmt_true->debug_print(depth + 1);
@@ -174,11 +176,18 @@ namespace ast {
         }
         std::cout << indent(depth) << "end if" << std::endl;
     }
+    void Block::debug_print(int depth) const {
+        std::cout << indent(depth) << pos << " block" << std::endl;
+        for(auto &stmt : stmts){
+            stmt->debug_print(depth + 1);
+        }
+        std::cout << indent(depth) << "end block" << std::endl;
+    }
     void Break::debug_print(int depth) const {
-        std::cout << indent(depth) << "break" << std::endl;
+        std::cout << indent(depth) << pos << " break" << std::endl;
     }
     void Continue::debug_print(int depth) const {
-        std::cout << indent(depth) << "continue" << std::endl;
+        std::cout << indent(depth) << pos << " continue" << std::endl;
     }
 }
 #endif

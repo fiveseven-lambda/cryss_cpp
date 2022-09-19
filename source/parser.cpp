@@ -207,73 +207,93 @@ std::tuple<std::vector<std::unique_ptr<ast::Expr>>, bool, pos::Range> parse_list
 std::unique_ptr<ast::Expr> parse_expr(lexer::Lexer &lexer){
     return parse_binary_operator(lexer, 0);
 }
+
+template <class EOFError, class UnexpectedTokenError>
+std::unique_ptr<token::Token> read_token(lexer::Lexer &lexer, bool (token::Token::*cond)() const, pos::Range &arg){
+    auto token = lexer.next();
+    if(!token) throw error::make<EOFError>(std::move(arg));
+    if(!((*token).*cond)()) throw error::make<UnexpectedTokenError>(std::move(arg), std::move(token->pos));
+    return token;
+}
+
 std::unique_ptr<ast::Stmt> parse_stmt(lexer::Lexer &lexer){
     auto &token_ref = lexer.peek();
     if(!token_ref) return nullptr;
-    if(auto keyword = token_ref->keyword()){
+    if(token_ref->is_opening_brace()){
+        auto pos_open = std::move(lexer.next()->pos);
+        std::vector<std::unique_ptr<ast::Stmt>> stmts;
+        while(auto stmt = parse_stmt(lexer)) stmts.push_back(std::move(stmt));
+        auto pos_close = std::move(read_token<error::NoClosingBracket, error::UnexpectedTokenInBracket>(lexer, &token::Token::is_closing_brace, pos_open)->pos);
+        auto ret = std::make_unique<ast::Block>(std::move(stmts));
+        ret->pos = pos_open + pos_close;
+        return ret;
+    }else if(auto keyword = token_ref->keyword()){
         if(keyword.value() == token::Keyword::If){
             auto pos_if = std::move(lexer.next()->pos);
-            auto cond_open = lexer.next();
-            if(!cond_open) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
-            if(!cond_open->is_opening_parenthesis()) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
-            auto [elems, trailing_comma, pos_close] = parse_list(lexer, token::BracketType::Round, cond_open->pos);
-            if(elems.size() != 1) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
+            auto cond_open = read_token<error::EOFAfterIf, error::UnexpectedTokenAfterIf>(lexer, &token::Token::is_opening_parenthesis, pos_if);
+            auto cond = parse_expr(lexer);
+            if(!cond) TODO;
+            auto cond_close = read_token<error::NoClosingBracket, error::UnexpectedTokenInBracket>(lexer, &token::Token::is_closing_parenthesis, cond_open->pos);
             auto stmt_true = parse_stmt(lexer);
-            if(!stmt_true) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
+            if(!stmt_true) TODO;
+            auto pos = pos_if + stmt_true->pos;
             std::unique_ptr<ast::Stmt> stmt_false;
             auto &maybe_else = lexer.peek();
             if(maybe_else && maybe_else->keyword() == token::Keyword::Else){
-                lexer.next();
+                auto pos_else = std::move(lexer.next()->pos);
                 stmt_false = parse_stmt(lexer);
+                if(!stmt_false) TODO;
+                pos += stmt_false->pos;
             }
-            auto pos = pos_if + (stmt_false ? stmt_false->pos : stmt_true->pos);
-            auto ret = std::make_unique<ast::If>(std::move(elems.front()), std::move(stmt_true), std::move(stmt_false));
+            auto ret = std::make_unique<ast::If>(std::move(cond), std::move(stmt_true), std::move(stmt_false));
             ret->pos = std::move(pos);
             return ret;
         }else if(keyword.value() == token::Keyword::While){
             auto pos_while = std::move(lexer.next()->pos);
-            auto cond_open = lexer.next();
-            if(!cond_open) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
-            if(!cond_open->is_opening_parenthesis()) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
-            auto [elems, trailing_comma, pos_close] = parse_list(lexer, token::BracketType::Round, cond_open->pos);
-            if(elems.size() != 1) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
+            auto cond_open = read_token<error::EOFAfterWhile, error::UnexpectedTokenAfterWhile>(lexer, &token::Token::is_opening_parenthesis, pos_while);
+            auto cond = parse_expr(lexer);
+            if(!cond) TODO;
+            auto cond_close = read_token<error::NoClosingBracket, error::UnexpectedTokenInBracket>(lexer, &token::Token::is_closing_parenthesis, cond_open->pos);
             auto stmt = parse_stmt(lexer);
-            if(!stmt) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
+            if(!stmt) TODO;
             auto pos = pos_while + stmt->pos;
-            auto ret = std::make_unique<ast::While>(std::move(elems.front()), std::move(stmt));
+            auto ret = std::make_unique<ast::While>(std::move(cond), std::move(stmt));
             ret->pos = std::move(pos);
             return ret;
         }else if(keyword.value() == token::Keyword::Break){
             auto pos_break = std::move(lexer.next()->pos);
-            auto semicolon = lexer.next();
-            if(!semicolon) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
-            if(!semicolon->is_semicolon()) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
+            auto semicolon = read_token<error::EOFAfterBreak, error::UnexpectedTokenAfterBreak>(lexer, &token::Token::is_semicolon, pos_break);
             auto ret = std::make_unique<ast::Break>();
             ret->pos = pos_break + semicolon->pos;
             return ret;
         }else if(keyword.value() == token::Keyword::Continue){
             auto pos_continue = std::move(lexer.next()->pos);
-            auto semicolon = lexer.next();
-            if(!semicolon) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
-            if(!semicolon->is_semicolon()) throw error::make<error::Unimplemented>(__FILE__, __LINE__);
+            auto semicolon = read_token<error::EOFAfterContinue, error::UnexpectedTokenAfterContinue>(lexer, &token::Token::is_semicolon, pos_continue);
             auto ret = std::make_unique<ast::Continue>();
             ret->pos = pos_continue + semicolon->pos;
             return ret;
+        }else{
+            TODO;
         }
     }
 
     auto expr = parse_expr(lexer);
-    auto token = lexer.next(); 
+    auto &token = lexer.peek();
     if(!token){
         // token_ref は nullptr でないが，token は nullptr．
-        // ここで expr は空でない
+        // よってここで expr は空でない
         throw error::make<error::EOFAfterExpr>(std::move(expr->pos));
     }
     if(token->is_semicolon()){
-        auto pos = expr ? expr->pos + token->pos : std::move(token->pos);
+        auto pos_semicolon = std::move(lexer.next()->pos);
+        auto pos = expr ? expr->pos + pos_semicolon : std::move(pos_semicolon);
         auto ret = std::make_unique<ast::ExprStmt>(std::move(expr));
         ret->pos = std::move(pos);
         return ret;
+    }else if(!expr){
+        return nullptr;
+    }else{
+        TODO;
     }
 }
 std::unique_ptr<ast::TopLevel> parse_top_level(lexer::Lexer &lexer){

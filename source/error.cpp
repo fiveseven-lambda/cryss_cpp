@@ -86,6 +86,26 @@ namespace error {
     UnexpectedTokenAfterExpr::UnexpectedTokenAfterExpr(pos::Range expr, pos::Range token):
         expr(std::move(expr)),
         token(std::move(token)) {}
+    EOFAfterIf::EOFAfterIf(pos::Range keyword):
+        keyword(std::move(keyword)) {}
+    UnexpectedTokenAfterIf::UnexpectedTokenAfterIf(pos::Range keyword, pos::Range token):
+        keyword(std::move(keyword)),
+        token(std::move(token)) {}
+    EOFAfterWhile::EOFAfterWhile(pos::Range keyword):
+        keyword(std::move(keyword)) {}
+    UnexpectedTokenAfterWhile::UnexpectedTokenAfterWhile(pos::Range keyword, pos::Range token):
+        keyword(std::move(keyword)),
+        token(std::move(token)) {}
+    EOFAfterBreak::EOFAfterBreak(pos::Range keyword):
+        keyword(std::move(keyword)) {}
+    UnexpectedTokenAfterBreak::UnexpectedTokenAfterBreak(pos::Range keyword, pos::Range token):
+        keyword(std::move(keyword)),
+        token(std::move(token)) {}
+    EOFAfterContinue::EOFAfterContinue(pos::Range keyword):
+        keyword(std::move(keyword)) {}
+    UnexpectedTokenAfterContinue::UnexpectedTokenAfterContinue(pos::Range keyword, pos::Range token):
+        keyword(std::move(keyword)),
+        token(std::move(token)) {}
     Unimplemented::Unimplemented(const char *file, unsigned line):
         file(file),
         line(line) {}
@@ -164,6 +184,46 @@ namespace error {
     void EOFAfterExpr::eprint(const std::deque<std::string> &log) const {
         std::cerr << "expected semicolon, found EOF after expression at " << expr << std::endl;
         expr.eprint(log);
+    }
+    void EOFAfterIf::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "expected condition, found EOF after `if` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void UnexpectedTokenAfterIf::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "unexpected token at " << token << std::endl;
+        token.eprint(log);
+        std::cerr << "expected condition after `if` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void EOFAfterWhile::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "expected condition, found EOF after `else` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void UnexpectedTokenAfterWhile::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "unexpected token at " << token << std::endl;
+        token.eprint(log);
+        std::cerr << "expected condition after `else` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void EOFAfterBreak::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "expected semicolon, found EOF after `break` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void UnexpectedTokenAfterBreak::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "unexpected token at " << token << std::endl;
+        token.eprint(log);
+        std::cerr << "expected semicolon after `break` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void EOFAfterContinue::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "expected semicolon, found EOF after `continue` at " << keyword << std::endl;
+        keyword.eprint(log);
+    }
+    void UnexpectedTokenAfterContinue::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "unexpected token at " << token << std::endl;
+        token.eprint(log);
+        std::cerr << "expected semicolon after `continue` at " << keyword << std::endl;
+        keyword.eprint(log);
     }
     void Unimplemented::eprint(const std::deque<std::string> &log) const {
         std::cerr << "error message unimplemented. file \"" << file << "\" line " << line << std::endl;
