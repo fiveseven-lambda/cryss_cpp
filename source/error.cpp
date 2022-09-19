@@ -10,45 +10,85 @@ namespace error {
      * @brief コンストラクタ
      * @param pos 予期せぬ文字のあった場所
      */
-    UnexpectedCharacter::UnexpectedCharacter(pos::Pos pos): pos(pos) {}
+    UnexpectedCharacter::UnexpectedCharacter(pos::Pos pos):
+        pos(pos) {}
     /**
      * @brief コンストラクタ
      * @param poss コメントの開始位置．ネストしていた場合それら全て
      */
-    UnterminatedComment::UnterminatedComment(std::vector<pos::Pos> poss): poss(std::move(poss)) {}
+    UnterminatedComment::UnterminatedComment(std::vector<pos::Pos> poss):
+        poss(std::move(poss)) {}
     /**
      * @brief コンストラクタ
      * @param pos 文字列リテラルの開始位置．
      */
-    UnterminatedStringLiteral::UnterminatedStringLiteral(pos::Pos pos): pos(pos) {}
+    UnterminatedStringLiteral::UnterminatedStringLiteral(pos::Pos pos):
+        pos(pos) {}
     /**
      * @brief コンストラクタ
      * @param prefix 前置演算子の位置
      * @param token 予期せぬトークンの位置
      */
-    UnexpectedTokenAfterPrefix::UnexpectedTokenAfterPrefix(pos::Range prefix, pos::Range token): prefix(std::move(prefix)), token(std::move(token)) {}
+    UnexpectedTokenAfterPrefix::UnexpectedTokenAfterPrefix(pos::Range prefix, pos::Range token):
+        prefix(std::move(prefix)),
+        token(std::move(token)) {}
     /**
      * @brief コンストラクタ
      * @param prefix 前置演算子の位置
      */
-    EOFAfterPrefix::EOFAfterPrefix(pos::Range prefix): prefix(std::move(prefix)) {}
+    EOFAfterPrefix::EOFAfterPrefix(pos::Range prefix):
+        prefix(std::move(prefix)) {}
     /**
      * @brief コンストラクタ
      * @param open 開き括弧の位置
      */
-    NoClosingParenthesis::NoClosingParenthesis(pos::Range open): open(std::move(open)) {}
+    NoClosingBracket::NoClosingBracket(pos::Range open):
+        open(std::move(open)) {}
     /**
      * @brief コンストラクタ
      * @param open 開き括弧の位置
      * @param token 予期せぬトークンの位置
      */
-    UnexpectedTokenInParenthesis::UnexpectedTokenInParenthesis(pos::Range open, pos::Range token): open(std::move(open)), token(std::move(token)) {}
+    UnexpectedTokenInBracket::UnexpectedTokenInBracket(pos::Range open, pos::Range token):
+        open(std::move(open)),
+        token(std::move(token)) {}
+    DifferentClosingBracket::DifferentClosingBracket(pos::Range open, pos::Range close):
+        open(std::move(open)),
+        close(std::move(close)) {}
+    EmptyIndex::EmptyIndex(pos::Range open, pos::Range close):
+        open(std::move(open)),
+        close(std::move(close)) {}
+    MultipleIndices::MultipleIndices(pos::Range open, pos::Range close):
+        open(std::move(open)),
+        close(std::move(close)) {}
     /**
      * @brief コンストラクタ
-     * @param open 開き括弧の位置
-     * @param close 閉じ括弧の位置
+     * @param infix 前置演算子の位置
+     * @param token 予期せぬトークンの位置
      */
-    EmptyParenthesis::EmptyParenthesis(pos::Range open, pos::Range close): open(std::move(open)), close(std::move(close)) {}
+    UnexpectedTokenAfterInfix::UnexpectedTokenAfterInfix(pos::Range infix, pos::Range token):
+        infix(std::move(infix)),
+        token(std::move(token)) {}
+    /**
+     * @brief コンストラクタ
+     * @param infix 前置演算子の位置
+     */
+    EOFAfterInfix::EOFAfterInfix(pos::Range infix):
+        infix(std::move(infix)) {}
+    /**
+     * @brief コンストラクタ
+     * @param comma 
+     */
+    EmptyItemInList::EmptyItemInList(pos::Range comma):
+        comma(std::move(comma)) {}
+    EOFAfterExpr::EOFAfterExpr(pos::Range expr):
+        expr(std::move(expr)) {}
+    UnexpectedTokenAfterExpr::UnexpectedTokenAfterExpr(pos::Range expr, pos::Range token):
+        expr(std::move(expr)),
+        token(std::move(token)) {}
+    Unimplemented::Unimplemented(const char *file, unsigned line):
+        file(file),
+        line(line) {}
 
     void UnexpectedCharacter::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unexpected character at " << pos << std::endl;
@@ -75,20 +115,57 @@ namespace error {
         std::cerr << "expected token, found EOF after prefix operator at " << prefix << std::endl;
         prefix.eprint(log);
     }
-    void NoClosingParenthesis::eprint(const std::deque<std::string> &log) const {
-        std::cerr << "no closing parenthesis corresponding to opening parenthesis at " << open << std::endl;
+    void NoClosingBracket::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "no closing bracket corresponding to opening bracket at " << open << std::endl;
         open.eprint(log);
     }
-    void UnexpectedTokenInParenthesis::eprint(const std::deque<std::string> &log) const {
+    void UnexpectedTokenInBracket::eprint(const std::deque<std::string> &log) const {
         std::cerr << "unexpected token at " << token << std::endl;
         token.eprint(log);
-        std::cerr << "parenthesis opened at " << open << std::endl;
+        std::cerr << "bracket opened at " << open << std::endl;
         open.eprint(log);
     }
-    void EmptyParenthesis::eprint(const std::deque<std::string> &log) const {
-        std::cerr << "empty parenthesis opened at " << open << std::endl;
-        open.eprint(log);
-        std::cerr << "closed at " << close << std::endl;
+    void DifferentClosingBracket::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "closing bracket at " << close << std::endl;
         close.eprint(log);
+        std::cerr << "does not match opening bracket at " << open << std::endl;
+        open.eprint(log);
+    }
+    void UnexpectedTokenAfterInfix::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "unexpected token at " << token << std::endl;
+        token.eprint(log);
+        std::cerr << "after infix operator at " << infix << std::endl;
+        infix.eprint(log);
+    }
+    void EOFAfterInfix::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "expected token, found EOF after infix operator at " << infix << std::endl;
+        infix.eprint(log);
+    }
+    void EmptyItemInList::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "empty item, expected expression before comma at " << comma << std::endl;
+        comma.eprint(log);
+    }
+    void EmptyIndex::eprint(const std::deque<std::string> &log) const {
+        auto pos = open + close;
+        std::cerr << "empty index at " << pos << std::endl;
+        pos.eprint(log);
+    }
+    void MultipleIndices::eprint(const std::deque<std::string> &log) const {
+        auto pos = open + close;
+        std::cerr << "multiple indices at " << pos << std::endl;
+        pos.eprint(log);
+    }
+    void UnexpectedTokenAfterExpr::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "unexpected token at " << token << std::endl;
+        token.eprint(log);
+        std::cerr << "expected semicolon after expression at " << expr << std::endl;
+        expr.eprint(log);
+    }
+    void EOFAfterExpr::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "expected semicolon, found EOF after expression at " << expr << std::endl;
+        expr.eprint(log);
+    }
+    void Unimplemented::eprint(const std::deque<std::string> &log) const {
+        std::cerr << "error message unimplemented. file \"" << file << "\" line " << line << std::endl;
     }
 }

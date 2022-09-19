@@ -88,32 +88,98 @@ namespace error {
     };
 
     /**
-     * @brief parser：開き丸括弧に対応する閉じ丸括弧が無いまま EOF に達した．
      */
-    class NoClosingParenthesis : public Error {
+    class NoClosingBracket: public Error {
         pos::Range open;
     public:
-        NoClosingParenthesis(pos::Range);
+        NoClosingBracket(pos::Range);
         void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
-     * @brief parser：丸括弧の中に予期せぬトークンがあった．
      */
-    class UnexpectedTokenInParenthesis : public Error {
+    class UnexpectedTokenInBracket : public Error {
         pos::Range open, token;
     public:
-        UnexpectedTokenInParenthesis(pos::Range, pos::Range);
+        UnexpectedTokenInBracket(pos::Range, pos::Range);
         void eprint(const std::deque<std::string> &) const override;
     };
 
     /**
-     * @brief parser：中身が空の丸括弧があった
      */
-    class EmptyParenthesis: public Error {
+    class DifferentClosingBracket: public Error {
         pos::Range open, close;
     public:
-        EmptyParenthesis(pos::Range, pos::Range);
+        DifferentClosingBracket(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+
+    /**
+     * @brief parser：中置演算子の後に予期せぬトークンがあった．
+     */
+    class UnexpectedTokenAfterInfix : public Error {
+        pos::Range infix, token;
+    public:
+        UnexpectedTokenAfterInfix(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+
+    /**
+     * @brief parser：中置演算子の後に EOF があった．
+     */
+    class EOFAfterInfix : public Error {
+        pos::Range infix;
+    public:
+        EOFAfterInfix(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     * @brief parser：
+     */
+    class EmptyItemInList : public Error {
+        pos::Range comma;
+    public:
+        EmptyItemInList(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    class EmptyIndex : public Error {
+        pos::Range open, close;
+    public:
+        EmptyIndex(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    class MultipleIndices : public Error {
+        pos::Range open, close;
+    public:
+        MultipleIndices(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     * @brief parser：
+     */
+    class EOFAfterExpr : public Error {
+        pos::Range expr;
+    public:
+        EOFAfterExpr(pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     * @brief parser：
+     */
+    class UnexpectedTokenAfterExpr : public Error {
+        pos::Range expr, token;
+    public:
+        UnexpectedTokenAfterExpr(pos::Range, pos::Range);
+        void eprint(const std::deque<std::string> &) const override;
+    };
+    /**
+     * @brief エラーメッセージが未実装
+     */
+    class Unimplemented: public Error {
+        const char *file;
+        unsigned line;
+    public:
+        Unimplemented(const char *, unsigned);
         void eprint(const std::deque<std::string> &) const override;
     };
 }

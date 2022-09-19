@@ -133,11 +133,20 @@ namespace pos {
                 << source[sline].substr(0, sbyte)
                 << " !-> "
                 << source[sline].substr(sbyte)
-                << std::endl
+                << std::endl;
+            if(eline - sline == 1){
+            }else if(eline - sline == 2){
+                std::cerr
+                << source[sline + 1]
+                << std::endl;
+            }else{
+                std::cerr
                 << " ("
                 << eline - sline - 1
-                << ")"
-                << std::endl
+                << " lines)"
+                << std::endl;
+            }
+            std::cerr
                 << source[eline].substr(0, ebyte)
                 << " <-! "
                 << source[eline].substr(ebyte)

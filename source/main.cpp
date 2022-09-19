@@ -27,6 +27,7 @@ static void run(const Config &config){
             auto item = parse_top_level(lexer);
             if(!item) break;
             item->debug_print(0);
+            lexer.reset_prompt();
         }
     }catch(std::unique_ptr<error::Error> &error){
         error->eprint(lexer.get_log());

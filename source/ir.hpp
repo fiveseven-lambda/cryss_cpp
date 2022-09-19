@@ -28,7 +28,7 @@ namespace ir {
      */
     class Func : public Value {
     public:
-        virtual ~Func();
+        virtual ~Func() override;
     };
     /**
      * @brief 音

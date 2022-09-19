@@ -27,10 +27,24 @@ namespace ast {
         op(op),
         left(std::move(left)),
         right(std::move(right)) {}
+    Index::Index(std::unique_ptr<Expr> operand, std::unique_ptr<Expr> index):
+        operand(std::move(operand)),
+        index(std::move(index)) {}
     List::List(std::vector<std::unique_ptr<Expr>> elems):
+        elems(std::move(elems)) {}
+    Tuple::Tuple(std::vector<std::unique_ptr<Expr>> elems):
         elems(std::move(elems)) {}
     Group::Group(std::unique_ptr<Expr> expr):
         expr(std::move(expr)) {}
+    ExprStmt::ExprStmt(std::unique_ptr<Expr> expr):
+        expr(std::move(expr)) {}
+    While::While(std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> stmt):
+        cond(std::move(cond)),
+        stmt(std::move(stmt)) {}
+    If::If(std::unique_ptr<Expr> cond, std::unique_ptr<Stmt> stmt_true, std::unique_ptr<Stmt> stmt_false):
+        cond(std::move(cond)),
+        stmt_true(std::move(stmt_true)),
+        stmt_false(std::move(stmt_false)) {}
 }
 
 #ifdef DEBUG
@@ -99,7 +113,6 @@ namespace ast {
             case BinaryOperator::BitAnd: name = "bitwise and"; break;
             case BinaryOperator::BitOr: name = "bitwise or"; break;
             case BinaryOperator::BitXor: name = "bitwise xor"; break;
-            case BinaryOperator::Index: name = "index"; break;
             case BinaryOperator::Assign: name = "assign"; break;
             case BinaryOperator::AddAssign: name = "add assign"; break;
             case BinaryOperator::SubAssign: name = "sub assign"; break;
@@ -118,6 +131,11 @@ namespace ast {
         left->debug_print(depth + 1);
         right->debug_print(depth + 1);
     }
+    void Index::debug_print(int depth) const {
+        std::cout << indent(depth) << "index" << std::endl;
+        operand->debug_print(depth + 1);
+        index->debug_print(depth + 1);
+    }
     void Group::debug_print(int depth) const {
         std::cout << indent(depth) << "group" << std::endl;
         expr->debug_print(depth + 1);
@@ -125,6 +143,42 @@ namespace ast {
     void List::debug_print(int depth) const {
         std::cout << indent(depth) << "list(" << elems.size() << ")" << std::endl;
         for(auto &elem : elems) elem->debug_print(depth + 1);
+    }
+    void Tuple::debug_print(int depth) const {
+        std::cout << indent(depth) << "tuple(" << elems.size() << ")" << std::endl;
+        for(auto &elem : elems) elem->debug_print(depth + 1);
+    }
+    void ExprStmt::debug_print(int depth) const {
+        if(expr){
+            std::cout << indent(depth) << "expression statement" << std::endl;
+            expr->debug_print(depth + 1);
+        }else{
+            std::cout << indent(depth) << "expression statement (empty)" << std::endl;
+        }
+    }
+    void While::debug_print(int depth) const {
+        std::cout << indent(depth) << "while" << std::endl;
+        cond->debug_print(depth + 1);
+        std::cout << indent(depth) << "do" << std::endl;
+        stmt->debug_print(depth + 1);
+        std::cout << indent(depth) << "end while" << std::endl;
+    }
+    void If::debug_print(int depth) const {
+        std::cout << indent(depth) << "if" << std::endl;
+        cond->debug_print(depth + 1);
+        std::cout << indent(depth) << "then" << std::endl;
+        stmt_true->debug_print(depth + 1);
+        if(stmt_false){
+            std::cout << indent(depth) << "else" << std::endl;
+            stmt_false->debug_print(depth + 1);
+        }
+        std::cout << indent(depth) << "end if" << std::endl;
+    }
+    void Break::debug_print(int depth) const {
+        std::cout << indent(depth) << "break" << std::endl;
+    }
+    void Continue::debug_print(int depth) const {
+        std::cout << indent(depth) << "continue" << std::endl;
     }
 }
 #endif

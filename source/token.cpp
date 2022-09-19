@@ -9,8 +9,21 @@ namespace token {
     Number::Number(std::string_view value): value(value) {}
     String::String(std::string value) : value(std::move(value)) {}
 
+    std::optional<Keyword> Token::keyword() { return std::nullopt; }
+    std::optional<Keyword> Identifier::keyword(){
+        if(name == "if") return Keyword::If;
+        else if(name == "else") return Keyword::Else;
+        else if(name == "while") return Keyword::While;
+        else if(name == "break") return Keyword::Break;
+        else if(name == "continue") return Keyword::Continue;
+        else if(name == "return") return Keyword::Return;
+        else return std::nullopt;
+    }
     std::unique_ptr<ast::Expr> Token::factor(){ return nullptr; }
-    std::unique_ptr<ast::Expr> Identifier::factor(){ return std::make_unique<ast::Identifier>(name); }
+    std::unique_ptr<ast::Expr> Identifier::factor(){
+        if(keyword()) return nullptr;
+        else return std::make_unique<ast::Identifier>(name);
+    }
     std::unique_ptr<ast::Expr> Number::factor(){ return std::make_unique<ast::Number>(value); }
     std::unique_ptr<ast::Expr> String::factor(){ return std::make_unique<ast::String>(std::move(value)); }
 
@@ -62,6 +75,12 @@ namespace token {
     std::optional<ast::BinaryOperator> TripleGreaterEqual::infix(){ return ast::BinaryOperator::ForwardShiftAssign; }
     std::optional<ast::BinaryOperator> TripleLessEqual::infix(){ return ast::BinaryOperator::BackwardShiftAssign; }
 
+    bool Token::is_comma() const { return false; }
+    bool Comma::is_comma() const { return true; }
+    bool Token::is_semicolon() const { return false; }
+    bool Semicolon::is_semicolon() const { return true; }
+    bool Token::is_colon() const { return false; }
+    bool Colon::is_colon() const { return true; }
     bool Token::is_opening_parenthesis() const { return false; }
     bool OpeningParenthesis::is_opening_parenthesis() const { return true; }
     bool Token::is_closing_parenthesis() const { return false; }
@@ -74,6 +93,13 @@ namespace token {
     bool OpeningBrace::is_opening_brace() const { return true; }
     bool Token::is_closing_brace() const { return false; }
     bool ClosingBrace::is_closing_brace() const { return true; }
+
+    std::optional<BracketType> Token::opening_bracket_type() const { return std::nullopt; }
+    std::optional<BracketType> Token::closing_bracket_type() const { return std::nullopt; }
+    std::optional<BracketType> OpeningParenthesis::opening_bracket_type() const { return BracketType::Round; }
+    std::optional<BracketType> ClosingParenthesis::closing_bracket_type() const { return BracketType::Round; }
+    std::optional<BracketType> OpeningBracket::opening_bracket_type() const { return BracketType::Square; }
+    std::optional<BracketType> ClosingBracket::closing_bracket_type() const { return BracketType::Square; }
 }
 
 #ifdef DEBUG

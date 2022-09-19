@@ -14,6 +14,18 @@
  * @brief トークンを定義する．
  */
 namespace token {
+    enum class Keyword {
+        If,
+        Else,
+        While,
+        Break,
+        Continue,
+        Return,
+    };
+    enum class BracketType {
+        Round,
+        Square,
+    };
     /**
      * @brief 全てのトークンの基底クラス
      */
@@ -23,9 +35,14 @@ namespace token {
         pos::Range pos;
         virtual ~Token();
         virtual std::unique_ptr<ast::Expr> factor();
+        virtual std::optional<Keyword> keyword();
         virtual std::optional<ast::UnaryOperator> prefix(), suffix();
         virtual std::optional<ast::BinaryOperator> infix();
+        virtual std::optional<BracketType> opening_bracket_type() const, closing_bracket_type() const;
         virtual bool
+            is_comma() const,
+            is_semicolon() const,
+            is_colon() const,
             is_opening_parenthesis() const,
             is_closing_parenthesis() const,
             is_opening_bracket() const,
@@ -43,6 +60,7 @@ namespace token {
         std::string_view name;
     public:
         Identifier(std::string_view);
+        std::optional<Keyword> keyword() override;
         std::unique_ptr<ast::Expr> factor() override;
 #ifdef DEBUG
         void debug_print(int) const override;
@@ -337,18 +355,21 @@ namespace token {
     };
     //! `:`
     class Colon : public Token {
+        bool is_colon() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
     };
     //! `;`
     class Semicolon : public Token {
+        bool is_semicolon() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
     };
     //! `,`
     class Comma : public Token {
+        bool is_comma() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
@@ -375,6 +396,7 @@ namespace token {
     //! `(`
     class OpeningParenthesis : public Token {
         bool is_opening_parenthesis() const override;
+        std::optional<BracketType> opening_bracket_type() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
@@ -382,6 +404,7 @@ namespace token {
     //! `)`
     class ClosingParenthesis : public Token {
         bool is_closing_parenthesis() const override;
+        std::optional<BracketType> closing_bracket_type() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
@@ -389,6 +412,7 @@ namespace token {
     //! `[`
     class OpeningBracket : public Token {
         bool is_opening_bracket() const override;
+        std::optional<BracketType> opening_bracket_type() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
@@ -396,6 +420,7 @@ namespace token {
     //! `]`
     class ClosingBracket : public Token {
         bool is_closing_bracket() const override;
+        std::optional<BracketType> closing_bracket_type() const override;
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif

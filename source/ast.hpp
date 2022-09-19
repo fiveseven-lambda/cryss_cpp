@@ -39,12 +39,13 @@ namespace ast {
     public:
         virtual ~Stmt() override;
 #ifdef DEBUG
-        virtual void debug_print(int) const = 0;
+        virtual void debug_print(int) const override = 0;
 #endif
     };
-    class Expr : public Stmt {
+    class Expr {
     public:
-        virtual ~Expr() override;
+        pos::Range pos;
+        virtual ~Expr();
 #ifdef DEBUG
         virtual void debug_print(int) const = 0;
 #endif
@@ -123,7 +124,6 @@ namespace ast {
         BitAnd,
         BitOr,
         BitXor,
-        Index,
         Assign,
         AddAssign,
         SubAssign,
@@ -147,6 +147,15 @@ namespace ast {
         void debug_print(int) const override;
 #endif
     };
+    class Index : public Expr {
+        std::unique_ptr<Expr> operand;
+        std::unique_ptr<Expr> index;
+    public:
+        Index(std::unique_ptr<Expr>, std::unique_ptr<Expr>);
+#ifdef DEBUG
+        void debug_print(int) const override;
+#endif
+    };
     class Group : public Expr {
         std::unique_ptr<Expr> expr;
     public:
@@ -159,6 +168,22 @@ namespace ast {
         std::vector<std::unique_ptr<Expr>> elems;
     public:
         List(std::vector<std::unique_ptr<Expr>>);
+#ifdef DEBUG
+        void debug_print(int) const override;
+#endif
+    };
+    class Tuple : public Expr {
+        std::vector<std::unique_ptr<Expr>> elems;
+    public:
+        Tuple(std::vector<std::unique_ptr<Expr>>);
+#ifdef DEBUG
+        void debug_print(int) const override;
+#endif
+    };
+    class ExprStmt : public Stmt {
+        std::unique_ptr<Expr> expr;
+    public:
+        ExprStmt(std::unique_ptr<Expr>);
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
@@ -196,6 +221,8 @@ namespace ast {
     class While : public Stmt {
         std::unique_ptr<Expr> cond;
         std::unique_ptr<Stmt> stmt;
+    public:
+        While(std::unique_ptr<Expr>, std::unique_ptr<Stmt>);
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif
@@ -204,6 +231,8 @@ namespace ast {
         std::unique_ptr<Expr> cond;
         std::unique_ptr<Stmt> stmt_true;
         std::unique_ptr<Stmt> stmt_false;
+    public:
+        If(std::unique_ptr<Expr>, std::unique_ptr<Stmt>, std::unique_ptr<Stmt>);
 #ifdef DEBUG
         void debug_print(int) const override;
 #endif

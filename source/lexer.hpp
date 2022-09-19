@@ -26,6 +26,8 @@ namespace lexer {
         std::vector<pos::Pos> comments;
         std::optional<std::pair<pos::Pos, std::string>> string;
     public:
+        bool is_first_token;
+        LineLexer();
         void run(
             std::size_t,
             const std::string_view &,
@@ -40,13 +42,12 @@ namespace lexer {
     class Lexer {
         std::istream &source;
         bool prompt;
-        bool is_beginning_of_sentence;
         std::deque<std::string> log;
         std::queue<std::unique_ptr<token::Token>> tokens;
         LineLexer line_lexer;
     public:
         Lexer(std::istream &, bool);
-        void beginning_of_sentence();
+        void reset_prompt();
         const std::deque<std::string> &get_log() const;
         std::unique_ptr<token::Token> next(), &peek();
     };

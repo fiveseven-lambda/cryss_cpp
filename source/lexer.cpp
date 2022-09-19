@@ -5,16 +5,16 @@
 #include "error.hpp"
 
 namespace lexer {
+    LineLexer::LineLexer(): is_first_token(true) {}
     /**
      * @brief コンストラクタ．
      */
     Lexer::Lexer(std::istream &source, bool prompt):
         source(source),
-        prompt(prompt),
-        is_beginning_of_sentence(true) {}
+        prompt(prompt) {}
 
-    void Lexer::beginning_of_sentence(){
-        is_beginning_of_sentence = true;
+    void Lexer::reset_prompt(){
+        line_lexer.is_first_token = true;
     }
     /**
      * @brief 今までに読んだ入力の記録を返す．
@@ -35,12 +35,7 @@ namespace lexer {
                 // log に空の std::string を追加し，1 行読んで格納
                 log.emplace_back();
                 if(prompt){
-                    if(is_beginning_of_sentence){
-                        std::cout << "> ";
-                        is_beginning_of_sentence = false;
-                    }else{
-                        std::cout << "+ ";
-                    }
+                    std::cout << (line_lexer.is_first_token ? "> " : "+ ");
                 }
                 std::getline(source, log.back());
                 // 字句解析を行う
